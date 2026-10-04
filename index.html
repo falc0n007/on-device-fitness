@@ -1497,6 +1497,7 @@ function viewSplitEditor(id) {
 function dayEditSheet(splitId, dow, draftIn) {
   const sp = Store.byId('splits', splitId); if (!sp) return;
   const day = draftIn || (S.dayDraft && S.dayDraft.splitId === splitId && S.dayDraft.dow === dow ? S.dayDraft.day : JSON.parse(JSON.stringify(sp.days[dow])));
+  if (!draftIn && day.rest && !day.exercises.length) { day.rest = false; day.name = ''; } // empty day opens ready for exercises
   S.dayDraft = { splitId, dow, day };
   const mini = (id, v, step, lab) => `<div style="flex:1;min-width:0"><span class="tiny muted">${lab}</span><div class="stepper"><button type="button" data-step="${id}" data-d="-${step}" style="flex:0 0 48px">−</button><input id="${id}" inputmode="numeric" value="${v}"><button type="button" data-step="${id}" data-d="${step}" style="flex:0 0 48px">+</button></div></div>`;
   openSheet(`${DOW[dow]}`, `
