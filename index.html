@@ -1,0 +1,700 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0f1115">
+<meta name="color-scheme" content="dark light">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>On-Device Fitness</title>
+<style>
+:root{--bg:#0f1115;--card:#181b22;--card2:#20242d;--text:#e8eaf0;--muted:#9aa3b2;--accent:#3ddc97;--accent-ink:#05281a;--danger:#ff6b6b;--warn:#f5c04a;--line:#2a2f3a;--shadow:0 6px 24px rgba(0,0,0,.45)}
+:root[data-theme=light]{--bg:#f4f6fa;--card:#fff;--card2:#eef1f6;--text:#161a22;--muted:#5b6575;--accent:#0e9f6e;--accent-ink:#fff;--danger:#d93a3a;--warn:#b7791f;--line:#dde2ea;--shadow:0 6px 24px rgba(0,0,0,.15)}
+@media (prefers-color-scheme:light){:root[data-theme=system]{--bg:#f4f6fa;--card:#fff;--card2:#eef1f6;--text:#161a22;--muted:#5b6575;--accent:#0e9f6e;--accent-ink:#fff;--danger:#d93a3a;--warn:#b7791f;--line:#dde2ea;--shadow:0 6px 24px rgba(0,0,0,.15)}}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;overflow-x:hidden;background:var(--bg);color:var(--text);font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;touch-action:manipulation}
+#app{display:flex;flex-direction:column;height:100dvh;max-width:640px;margin:0 auto}
+main{flex:1;overflow-y:auto;overflow-x:hidden;padding:calc(12px + env(safe-area-inset-top)) 16px 96px;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+h1{font-size:22px;margin:4px 0 12px}h2{font-size:17px;margin:20px 0 8px}h3{font-size:15px;margin:0 0 4px}
+p{margin:6px 0}.muted{color:var(--muted)}.small{font-size:13px}.tiny{font-size:12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;margin:10px 0}
+.row{display:flex;align-items:center;gap:10px}.row.sp{justify-content:space-between}.wrap{flex-wrap:wrap}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stat{background:var(--card2);border-radius:12px;padding:10px 12px;min-width:0}
+.stat b{display:block;font-size:22px;line-height:1.2}.stat span{font-size:12px;color:var(--muted)}
+button,.btn{font:inherit;color:var(--text);background:var(--card2);border:1px solid var(--line);border-radius:14px;min-height:48px;min-width:48px;padding:0 16px;cursor:pointer;transition:transform .08s,filter .08s}
+button:active,.btn:active{transform:scale(.97);filter:brightness(1.2)}
+.primary{background:var(--accent);color:var(--accent-ink);border-color:transparent;font-weight:700}
+.danger{color:var(--danger)}
+.block{width:100%}
+.chip{display:inline-flex;align-items:center;min-height:48px;padding:0 16px;border-radius:24px}
+.seg{display:flex;gap:8px;flex-wrap:wrap}
+.seg button{flex:1;min-width:0}
+.seg button.on{background:var(--accent);color:var(--accent-ink);border-color:transparent;font-weight:700}
+label.f{display:block;margin:12px 0}label.f>span{display:block;font-size:13px;color:var(--muted);margin-bottom:4px}
+input,select{font:inherit;font-size:16px;color:var(--text);background:var(--card2);border:1px solid var(--line);border-radius:12px;min-height:48px;padding:0 12px;width:100%}
+input[type=range]{padding:0;accent-color:var(--accent)}
+.stepper{display:flex;gap:8px}.stepper input{text-align:center;flex:1;min-width:0}.stepper button{flex:0 0 52px;padding:0;font-size:22px}
+details{margin-top:8px}summary{cursor:pointer;min-height:32px;color:var(--muted);font-size:13px;list-style:none}
+summary::-webkit-details-marker{display:none}summary::before{content:"ⓘ  "}
+details[open] summary{color:var(--text)}
+.why{font-size:13px;color:var(--muted);background:var(--card2);border-radius:10px;padding:8px 10px;margin-top:6px}
+.why div{margin:2px 0}.why code{color:var(--text);font-family:ui-monospace,Menlo,monospace;font-size:12.5px}
+.banner{border-left:4px solid var(--warn)}
+.note{border-left:4px solid var(--accent)}
+nav{position:fixed;left:0;right:0;bottom:0;display:flex;background:var(--card);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom);z-index:20;max-width:640px;margin:0 auto}
+nav button{flex:1;border:0;border-radius:0;background:transparent;min-height:60px;font-size:11px;color:var(--muted);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:0}
+nav button span{font-size:20px;line-height:1}nav button.on{color:var(--accent);font-weight:700}
+.fab{position:fixed;right:16px;bottom:calc(76px + env(safe-area-inset-bottom));z-index:15;min-height:56px;padding:0 22px;border-radius:28px;box-shadow:var(--shadow);font-size:16px}
+#backdrop{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:30;opacity:0;pointer-events:none;transition:opacity .2s}
+#backdrop.on{opacity:1;pointer-events:auto}
+#sheet{position:fixed;left:0;right:0;bottom:0;max-width:640px;margin:0 auto;max-height:90dvh;overflow-y:auto;background:var(--card);border-radius:20px 20px 0 0;z-index:31;padding:8px 16px calc(20px + env(safe-area-inset-bottom));transform:translateY(105%);transition:transform .22s ease;box-shadow:var(--shadow)}
+#sheet.on{transform:none}
+#sheet .grab{width:40px;height:5px;background:var(--line);border-radius:3px;margin:4px auto 10px}
+#toast{position:fixed;left:16px;right:16px;bottom:calc(84px + env(safe-area-inset-bottom));z-index:40;max-width:608px;margin:0 auto;background:var(--card2);border:1px solid var(--line);border-radius:14px;padding:6px 6px 6px 16px;display:none;align-items:center;justify-content:space-between;gap:8px;box-shadow:var(--shadow)}
+#toast.on{display:flex}
+.chartbox{overflow-x:auto;overflow-y:hidden;border-radius:12px;background:var(--card2)}
+.chartbox svg{display:block}
+.readout{min-height:22px;font-size:13px;margin:6px 0}
+.item{position:relative;overflow:hidden;border-radius:12px;margin:6px 0;background:var(--danger)}
+.item>.in{position:relative;background:var(--card2);padding:10px 12px;min-height:56px;display:flex;align-items:center;justify-content:space-between;gap:8px;touch-action:pan-y;transition:transform .15s}
+.bar{height:10px;border-radius:5px;background:var(--card2);overflow:hidden;display:flex}
+.bar i{display:block;height:100%}
+.empty{text-align:center;padding:28px 12px;color:var(--muted)}
+.err{color:var(--danger);font-size:13px;min-height:18px}
+@media (orientation:landscape) and (max-height:500px){nav button{min-height:48px;flex-direction:row;justify-content:center;gap:6px}main{padding-bottom:72px}.fab{bottom:calc(60px + env(safe-area-inset-bottom))}}
+</style>
+</head>
+<body>
+<div id="app"><main id="main" tabindex="-1"></main></div>
+<nav id="tabs" aria-label="Main"></nav>
+<div id="backdrop"></div>
+<div id="sheet" role="dialog" aria-modal="true"></div>
+<div id="toast" role="status"></div>
+<input type="file" id="importFile" accept="application/json,.json" hidden>
+
+<script>
+// EXTENSION POINTS: Store (swap storage backend), migrate() (schema upgrades), record.source ("manual" → future imports), pure Calc functions (no DOM), versioned EXPORT FORMAT below.
+'use strict';
+
+/* ===========================================================================
+ * EXPORT FORMAT (schemaVersion 1) — a companion script may write the same shape and import it:
+ * {
+ *   "app": "on-device-fitness",
+ *   "schemaVersion": 1,
+ *   "exportedAt": ISO timestamp,
+ *   "settings": { units:{weight:"kg|lb",height:"cm|in",volume:"ml|oz"}, theme:"dark|system", createdAt, lastBackupAt },
+ *   "profile":  { age, sex:"male|female", heightCm, goal:"cut|maintain|lean_bulk|recomp", activity:"sedentary|light|moderate|very|athlete",
+ *                 calAdjPct:number|null (null = goal default), proteinPerKg } | null,
+ *   "metrics":  [ { id, type:"weight|bodyfat", date:"YYYY-MM-DD", value (kg or %), source:"manual", createdAt, updatedAt } ]
+ * }
+ * All values are metric. Time-based metrics are simple dated entries so imported data can slot in.
+ * CONFLICT RULE (documented, not built): if imported and manual values exist for the same metric and day, the manual value wins.
+ * =========================================================================== */
+
+/* ------------------------------ Storage layer ------------------------------ */
+const SCHEMA_VERSION = 1;
+const MIGRATIONS = {/* from-version: fn(data) → data, e.g. 1: d => { d.newField = []; return d; } */};
+
+function migrate(data) {
+  let v = Number(data.schemaVersion) || 1;
+  while (v < SCHEMA_VERSION) { if (MIGRATIONS[v]) data = MIGRATIONS[v](data); v++; }
+  data.schemaVersion = SCHEMA_VERSION;
+  return data;
+}
+
+const Store = (() => {
+  const KEY = 'fitness.data';
+  let mem = null, storageOk = true;
+  const defaults = () => ({
+    schemaVersion: SCHEMA_VERSION,
+    settings: { units: { weight: 'kg', height: 'cm', volume: 'ml' }, theme: 'dark', createdAt: new Date().toISOString(), lastBackupAt: null },
+    profile: null,
+    metrics: []
+  });
+  function normalize(d) {
+    const base = defaults();
+    d.settings = Object.assign(base.settings, d.settings || {});
+    d.settings.units = Object.assign(base.settings.units, (d.settings || {}).units || {});
+    d.profile = d.profile || null;
+    d.metrics = Array.isArray(d.metrics) ? d.metrics : [];
+    return d;
+  }
+  function persist() {
+    try { localStorage.setItem(KEY, JSON.stringify(mem)); storageOk = true; }
+    catch (e) { storageOk = false; }
+    return storageOk;
+  }
+  function load() {
+    try {
+      const raw = localStorage.getItem(KEY);
+      mem = raw ? normalize(migrate(JSON.parse(raw))) : defaults();
+    } catch (e) { mem = defaults(); }
+    return mem;
+  }
+  load();
+  return {
+    get: () => mem,
+    isOk: () => storageOk,
+    save(mutator) { mutator(mem); return persist(); },
+    list(coll, type) { return mem[coll].filter(r => !type || r.type === type); },
+    put(coll, rec) {                        // insert or update by id
+      const i = mem[coll].findIndex(r => r.id === rec.id);
+      if (i >= 0) mem[coll][i] = rec; else mem[coll].push(rec);
+      return persist();
+    },
+    del(coll, id) { mem[coll] = mem[coll].filter(r => r.id !== id); return persist(); },
+    replaceAll(data) { mem = normalize(migrate(data)); return persist(); },
+    reset() { mem = defaults(); return persist(); },
+    exportObject() {
+      return { app: 'on-device-fitness', schemaVersion: SCHEMA_VERSION, exportedAt: new Date().toISOString(),
+        settings: mem.settings, profile: mem.profile, metrics: mem.metrics };
+    }
+  };
+})();
+
+const uid = () => (crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2, 10));
+const nowISO = () => new Date().toISOString();
+function newRecord(type, date, value) {
+  return { id: uid(), type, date, value, source: 'manual', createdAt: nowISO(), updatedAt: nowISO() };
+}
+/** One dated entry per metric type per day; logging again the same day updates it. */
+function logMetric(type, date, value) {
+  const ex = Store.list('metrics', type).find(r => r.date === date);
+  if (ex) return Store.put('metrics', Object.assign({}, ex, { value, updatedAt: nowISO() }));
+  return Store.put('metrics', newRecord(type, date, value));
+}
+function validateImport(d) {
+  if (!d || typeof d !== 'object') return 'Not a JSON object.';
+  if (d.app !== 'on-device-fitness') return 'This file is not an On-Device Fitness backup.';
+  if (typeof d.schemaVersion !== 'number') return 'Missing schemaVersion.';
+  if (d.schemaVersion > SCHEMA_VERSION) return 'This backup is from a newer version of the app.';
+  if (d.metrics && !Array.isArray(d.metrics)) return 'metrics must be a list.';
+  for (const m of d.metrics || []) {
+    if (!m || !m.id || !['weight', 'bodyfat'].includes(m.type) || !/^\d{4}-\d{2}-\d{2}$/.test(m.date) || !isFinite(m.value)) return 'A metric entry is malformed.';
+  }
+  return null;
+}
+
+/* ---------------------- Pure calculations (no DOM access) ---------------------- */
+const ACTIVITY = {
+  sedentary: { f: 1.2,   label: 'Sedentary',        hint: 'desk job, little exercise' },
+  light:     { f: 1.375, label: 'Lightly active',   hint: 'exercise 1–3 days/week' },
+  moderate:  { f: 1.55,  label: 'Moderately active', hint: 'exercise 3–5 days/week' },
+  very:      { f: 1.725, label: 'Very active',      hint: 'hard exercise 6–7 days/week' },
+  athlete:   { f: 1.9,   label: 'Extremely active', hint: 'physical job + daily training' }
+};
+const GOALS = {
+  cut:       { label: 'Cut',       pct: -17.5, range: '−15 to −20%' },
+  maintain:  { label: 'Maintain',  pct: 0,     range: '0%' },
+  lean_bulk: { label: 'Lean bulk', pct: 7.5,   range: '+5 to +10%' },
+  recomp:    { label: 'Recomp',    pct: -5,    range: 'about −5%' }
+};
+const KCAL_PER_KG = 7700; // common approximation for 1 kg of body weight change
+const r0 = n => Math.round(n), r1 = n => Math.round(n * 10) / 10, r2 = n => Math.round(n * 100) / 100;
+
+const Calc = {
+  dayNum: s => { const [y, m, d] = s.split('-').map(Number); return Date.UTC(y, m - 1, d) / 864e5; },
+
+  bmr(p, weightKg, bfPct) {
+    if (bfPct != null && isFinite(bfPct)) {
+      const lbm = weightKg * (1 - bfPct / 100);
+      const kcal = 370 + 21.6 * lbm;
+      return { kcal, method: 'Katch-McArdle', why: [
+        `Body fat is entered, so Katch-McArdle is used (it accounts for lean mass).`,
+        `Lean mass = ${r1(weightKg)} kg × (1 − ${r1(bfPct)}%) = <code>${r1(lbm)} kg</code>`,
+        `BMR = 370 + 21.6 × ${r1(lbm)} = <code>${r0(kcal)} kcal</code>`,
+        `Body fat is an estimate from wrist BIA, so treat this as ± ~100 kcal.`] };
+    }
+    const kcal = 10 * weightKg + 6.25 * p.heightCm - 5 * p.age + (p.sex === 'male' ? 5 : -161);
+    return { kcal, method: 'Mifflin-St Jeor', why: [
+      `No body fat entered, so Mifflin-St Jeor is used.`,
+      `BMR = 10 × ${r1(weightKg)} kg + 6.25 × ${r0(p.heightCm)} cm − 5 × ${p.age} y ${p.sex === 'male' ? '+ 5' : '− 161'} = <code>${r0(kcal)} kcal</code>`] };
+  },
+
+  /** stepKcal: optional extra kcal/day from steps/training (null = not used). */
+  tdee(bmr, activityKey, stepKcal) {
+    const f = ACTIVITY[activityKey].f;
+    let kcal = bmr * f;
+    const why = [`TDEE = BMR × activity factor = ${r0(bmr)} × ${f} (${ACTIVITY[activityKey].label.toLowerCase()}) = <code>${r0(kcal)} kcal</code>`];
+    if (stepKcal) { kcal += stepKcal; why.push(`+ ${r0(stepKcal)} kcal from steps/training adjustment = <code>${r0(kcal)} kcal</code>`); }
+    why.push(`Activity factors are rough averages; real expenditure varies by person.`);
+    return { kcal, why };
+  },
+
+  calorieTarget(tdee, goal, pctOverride) {
+    const pct = pctOverride != null ? pctOverride : GOALS[goal].pct;
+    const kcal = tdee * (1 + pct / 100);
+    return { kcal, pct, why: [
+      `Goal: ${GOALS[goal].label} (typical range ${GOALS[goal].range}).`,
+      `Adjustment used: <code>${pct > 0 ? '+' : ''}${pct}%</code>${pctOverride != null ? ' (your custom value)' : ' (default for this goal)'}`,
+      `Target = ${r0(tdee)} × (1 ${pct < 0 ? '−' : '+'} ${Math.abs(pct) / 100}) = <code>${r0(kcal)} kcal</code>`] };
+  },
+
+  macros(kcal, weightKg, proteinPerKg) {
+    const protein = proteinPerKg * weightKg;
+    const fatFloor = 0.6 * weightKg, fatPct = 0.25 * kcal / 9;
+    const fat = Math.max(fatFloor, fatPct);
+    let carbs = (kcal - protein * 4 - fat * 9) / 4;
+    const squeezed = carbs < 0; if (squeezed) carbs = 0;
+    const fiber = 14 * kcal / 1000;
+    return {
+      protein: { g: protein, why: [`Protein = ${proteinPerKg} g/kg × ${r1(weightKg)} kg = <code>${r0(protein)} g</code> (${r0(protein * 4)} kcal).`, `Common evidence-based range is 1.6–2.2 g/kg; default 2.0.`] },
+      fat: { g: fat, why: [`Fat = the larger of 0.6 g/kg (${r0(fatFloor)} g) and 25% of calories (${r0(fatPct)} g) = <code>${r0(fat)} g</code> (${r0(fat * 9)} kcal).`] },
+      carbs: { g: carbs, why: [`Carbs fill the remainder: (${r0(kcal)} − ${r0(protein * 4)} protein kcal − ${r0(fat * 9)} fat kcal) ÷ 4 = <code>${r0(carbs)} g</code>.`].concat(squeezed ? [`Calories are too low to fit protein and fat; carbs are floored at 0. You might consider a smaller deficit or lower protein.`] : []) },
+      fiber: { g: fiber, why: [`Fiber ≈ 14 g per 1,000 kcal = 14 × ${r2(kcal / 1000)} = <code>${r0(fiber)} g</code>.`] }
+    };
+  },
+
+  /** Calendar-based 7-day moving average. entries: [{date, value}] → [{date, value, ma}] sorted. */
+  movingAvg(entries, window = 7) {
+    const s = entries.slice().sort((a, b) => a.date < b.date ? -1 : 1).map(e => ({ date: e.date, value: e.value, n: Calc.dayNum(e.date) }));
+    return s.map(e => {
+      const w = s.filter(x => x.n <= e.n && x.n > e.n - window);
+      return { date: e.date, value: e.value, ma: w.reduce((a, x) => a + x.value, 0) / w.length };
+    });
+  },
+
+  /** Least-squares slope of the moving average over the last `days` days, in kg/week. null if not enough data. */
+  trendPerWeek(series, days = 14) {
+    if (series.length < 2) return null;
+    const last = Calc.dayNum(series[series.length - 1].date);
+    const pts = series.filter(p => Calc.dayNum(p.date) >= last - days).map(p => [Calc.dayNum(p.date), p.ma]);
+    if (pts.length < 3) return null;
+    const n = pts.length, mx = pts.reduce((a, p) => a + p[0], 0) / n, my = pts.reduce((a, p) => a + p[1], 0) / n;
+    const den = pts.reduce((a, p) => a + (p[0] - mx) ** 2, 0);
+    return den ? 7 * pts.reduce((a, p) => a + (p[0] - mx) * (p[1] - my), 0) / den : null;
+  },
+
+  /** Suggested review once ≥14 days of weight data: actual trend vs. what the calorie target implies. */
+  trendReview(series, tdeeKcal, targetKcal) {
+    if (series.length < 3) return null;
+    const span = Calc.dayNum(series[series.length - 1].date) - Calc.dayNum(series[0].date);
+    if (span < 14) return { ready: false, daysLeft: Math.ceil(14 - span) };
+    const actual = Calc.trendPerWeek(series, 14);
+    if (actual == null) return { ready: false, daysLeft: 0 };
+    const expected = (targetKcal - tdeeKcal) * 7 / KCAL_PER_KG;
+    const diff = actual - expected;
+    const kcalGap = diff * KCAL_PER_KG / 7;
+    return { ready: true, actual, expected, diff, kcalGap, onTrack: Math.abs(diff) < 0.15,
+      why: [`Actual: slope of your 7-day average over the last 14 days = <code>${r2(actual)} kg/week</code>.`,
+            `Expected: (${r0(targetKcal)} − ${r0(tdeeKcal)}) kcal/day × 7 ÷ ${KCAL_PER_KG} kcal/kg = <code>${r2(expected)} kg/week</code>.`,
+            `Within ±0.15 kg/week counts as "on track". Otherwise gap ${r2(diff)} kg/week × ${KCAL_PER_KG} ÷ 7 ≈ <code>${r0(Math.abs(kcalGap))} kcal/day</code> difference.`] };
+  },
+
+  /** Full target set from raw inputs. Returns null if inputs are incomplete. */
+  targets(profile, weightKg, bfPct, stepKcal) {
+    if (!profile || !weightKg) return null;
+    const bmr = Calc.bmr(profile, weightKg, bfPct);
+    const tdee = Calc.tdee(bmr.kcal, profile.activity, stepKcal);
+    const cal = Calc.calorieTarget(tdee.kcal, profile.goal, profile.calAdjPct);
+    const macros = Calc.macros(cal.kcal, weightKg, profile.proteinPerKg || 2.0);
+    return { bmr, tdee, cal, macros };
+  }
+};
+
+/* ------------------------------ Units ------------------------------ */
+const U = {
+  w: () => Store.get().settings.units.weight, h: () => Store.get().settings.units.height, v: () => Store.get().settings.units.volume,
+  wToDisp: kg => U.w() === 'lb' ? kg * 2.20462262 : kg,
+  wFromDisp: x => U.w() === 'lb' ? x / 2.20462262 : x,
+  hToDisp: cm => U.h() === 'in' ? cm / 2.54 : cm,
+  hFromDisp: x => U.h() === 'in' ? x * 2.54 : x,
+  fw: kg => r1(U.wToDisp(kg)) + ' ' + U.w(),
+  fh: cm => (U.h() === 'in' ? r1(cm / 2.54) : r0(cm)) + ' ' + U.h()
+};
+
+/* ------------------------------ Helpers ------------------------------ */
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const todayStr = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; };
+const fmtDate = s => { const [y, m, d] = s.split('-').map(Number); return new Date(y, m - 1, d).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }); };
+const buzz = ms => { try { navigator.vibrate && navigator.vibrate(ms); } catch (e) {} };
+const why = (lines, label) => `<details><summary>Why this number?${label ? ' · ' + label : ''}</summary><div class="why">${lines.map(l => `<div>${l}</div>`).join('')}</div></details>`;
+
+function persistWarn(ok) { if (!ok) toast("Couldn't save — browser storage looks unavailable. Export a backup if you can."); return ok; }
+
+let toastTimer = null, toastUndo = null;
+function toast(msg, undo) {
+  const t = $('#toast'); toastUndo = undo || null;
+  t.innerHTML = `<span>${esc(msg)}</span>${undo ? '<button data-act="undo" class="primary">Undo</button>' : ''}`;
+  t.classList.add('on'); clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('on'), undo ? 6000 : 3500);
+}
+
+function openSheet(title, html, onMount) {
+  $('#sheet').innerHTML = `<div class="grab"></div><div class="row sp"><h2 style="margin:4px 0">${esc(title)}</h2><button data-act="closeSheet" aria-label="Close">✕</button></div>${html}`;
+  $('#sheet').classList.add('on'); $('#backdrop').classList.add('on');
+  $('#sheet').scrollTop = 0;
+  if (onMount) onMount($('#sheet'));
+}
+function closeSheet() { $('#sheet').classList.remove('on'); $('#backdrop').classList.remove('on'); }
+// Keep the focused input visible above the on-screen keyboard.
+document.addEventListener('focusin', e => {
+  if (e.target.matches('input,select')) setTimeout(() => e.target.scrollIntoView({ block: 'center', behavior: 'smooth' }), 300);
+});
+
+function stepper(id, value, step, unit) {
+  return `<div class="stepper"><button type="button" data-step="${id}" data-d="-${step}" aria-label="Decrease">−</button>
+    <input id="${id}" inputmode="decimal" autocomplete="off" value="${value ?? ''}" ${unit ? `aria-label="${unit}"` : ''}>
+    <button type="button" data-step="${id}" data-d="${step}" aria-label="Increase">+</button></div>`;
+}
+const num = id => { const v = parseFloat(String($('#' + id).value).replace(',', '.')); return isFinite(v) ? v : null; };
+
+/* ------------------------------ State & views ------------------------------ */
+let tab = 'today';
+const TABS = [['today', '🏠', 'Today'], ['workout', '🏋️', 'Workout'], ['food', '🍽️', 'Food'], ['trends', '📈', 'Trends'], ['settings', '⚙️', 'Settings']];
+let subview = null; // 'targets' | 'profile-history' | null (sub-screens reached from a tab)
+
+function applyTheme() {
+  const t = Store.get().settings.theme === 'system' ? 'system' : 'dark';
+  document.documentElement.dataset.theme = t;
+  const light = t === 'system' && matchMedia('(prefers-color-scheme: light)').matches;
+  $('meta[name=theme-color]').content = light ? '#f4f6fa' : '#0f1115';
+}
+matchMedia('(prefers-color-scheme: light)').addEventListener('change', applyTheme);
+
+function currentInputs() {
+  const p = Store.get().profile;
+  const w = latest('weight'), bf = latest('bodyfat');
+  return { p, weightKg: w ? w.value : null, bf: bf ? bf.value : null, wDate: w && w.date, bfDate: bf && bf.date };
+}
+function latest(type) {
+  const l = Store.list('metrics', type).sort((a, b) => a.date < b.date ? 1 : -1);
+  return l[0] || null;
+}
+function weightSeries() { return Calc.movingAvg(Store.list('metrics', 'weight').map(m => ({ date: m.date, value: m.value }))); }
+function bfSeries() { return Calc.movingAvg(Store.list('metrics', 'bodyfat').map(m => ({ date: m.date, value: m.value }))); }
+function getTargets() { const i = currentInputs(); return Calc.targets(i.p, i.weightKg, i.bf, null); }
+
+function render() {
+  $('#tabs').innerHTML = TABS.map(([k, ic, lb]) => `<button data-tab="${k}" class="${k === tab && !subview ? 'on' : ''}" aria-label="${lb}"><span>${ic}</span>${lb}</button>`).join('');
+  const m = $('#main');
+  const html = subview === 'targets' ? viewTargets() : ({ today: viewToday, workout: () => comingSoon('Workout', 'Phase 3: split builder, set logging and history.'), food: () => comingSoon('Food', 'Phase 2: macro tracker with water, salt and sugar.'), trends: viewTrends, settings: viewSettings })[tab]();
+  m.innerHTML = html;
+  const cb = m.querySelector('.chartbox'); if (cb) requestAnimationFrame(() => document.querySelectorAll('.chartbox').forEach(c => c.scrollLeft = c.scrollWidth));
+}
+function go(t, sub) { tab = t; subview = sub || null; render(); $('#main').scrollTop = 0; }
+
+function comingSoon(name, text) {
+  return `<h1>${name}</h1><div class="card empty"><p><b>Not built yet</b></p><p class="small">${text}</p></div>`;
+}
+
+function backupDue() {
+  const s = Store.get().settings;
+  if (!Store.get().metrics.length && !Store.get().profile) return false;
+  const ref = s.lastBackupAt || s.createdAt;
+  return (Date.now() - new Date(ref).getTime()) > 14 * 864e5;
+}
+
+function viewToday() {
+  const i = currentInputs(), t = getTargets();
+  let h = `<h1>Today</h1>`;
+  if (backupDue()) h += `<div class="card banner"><p><b>Back up your data?</b></p><p class="small muted">Browser storage can be cleared. It's been over 2 weeks since your last backup — you might want to export one.</p><button class="block" data-act="export">Export backup</button></div>`;
+  if (!i.p) {
+    h += `<div class="card note"><p><b>Welcome 👋</b></p><p class="small muted">Everything stays on this device. Set up your profile and I'll suggest daily targets — all of them adjustable, none of them orders.</p><button class="primary block" data-act="profile">Set up profile</button></div>`;
+  } else if (t) {
+    const g = t.macros;
+    h += `<div class="card"><div class="row sp"><h3>Daily targets <span class="muted small">· ${GOALS[i.p.goal].label}</span></h3><button data-act="targets" class="small">Details</button></div>
+      <div class="stat" style="margin:8px 0"><b>${r0(t.cal.kcal)} kcal</b><span>suggested calories</span></div>
+      <div class="grid2">${[['Protein', g.protein.g, 'g'], ['Carbs', g.carbs.g, 'g'], ['Fat', g.fat.g, 'g'], ['Fiber', g.fiber.g, 'g']].map(([n, v, u]) => `<div class="stat"><b>${r0(v)} ${u}</b><span>${n}</span></div>`).join('')}</div>
+      ${why(t.cal.why)}</div>`;
+    const s = weightSeries(), last = s[s.length - 1];
+    h += `<div class="card"><div class="row sp"><h3>Weight</h3><span class="muted small">${i.wDate === todayStr() ? 'logged today' : 'last: ' + fmtDate(i.wDate)}</span></div>
+      <div class="grid2" style="margin-top:8px"><div class="stat"><b>${U.fw(i.weightKg)}</b><span>latest</span></div><div class="stat"><b>${last ? U.fw(last.ma) : '—'}</b><span>7-day average</span></div></div>
+      ${i.bf != null ? `<p class="small muted">Body fat (estimated): ${r1(i.bf)}%</p>` : ''}</div>`;
+  } else {
+    h += `<div class="card note"><p>Log a weight to calculate targets.</p></div>`;
+  }
+  h += `<p class="tiny muted" style="margin-top:20px">Food, water and workouts arrive in the next phases.</p>
+  <button class="primary fab" data-act="logWeight">＋ Log weight</button>`;
+  return h;
+}
+
+function viewTargets() {
+  const i = currentInputs(), t = getTargets();
+  let h = `<div class="row"><button data-act="back" aria-label="Back">←</button><h1 style="margin:0">Targets</h1></div>`;
+  if (!i.p) return h + `<div class="card empty"><p>Set up your profile first.</p><button class="primary" data-act="profile">Set up profile</button></div>`;
+  if (!t) return h + `<div class="card empty"><p>Log a weight first.</p><button class="primary" data-act="logWeight">Log weight</button></div>`;
+  const g = t.macros;
+  h += `<p class="small muted">All numbers are suggestions based on formulas — tap “Why this number?” under any of them.</p>
+  <div class="card"><h3>Energy</h3><div class="grid2" style="margin-top:8px">
+    <div class="stat"><b>${r0(t.bmr.kcal)}</b><span>BMR · ${t.bmr.method}</span></div>
+    <div class="stat"><b>${r0(t.tdee.kcal)}</b><span>TDEE · maintenance</span></div></div>
+    ${why(t.bmr.why, 'BMR')}${why(t.tdee.why, 'TDEE')}</div>
+  <div class="card"><h3>Calorie target</h3><div class="stat" style="margin:8px 0"><b>${r0(t.cal.kcal)} kcal/day</b><span>${GOALS[i.p.goal].label} · ${t.cal.pct > 0 ? '+' : ''}${t.cal.pct}% vs TDEE</span></div>${why(t.cal.why)}
+    <label class="f"><span>Adjustment % (typical for ${GOALS[i.p.goal].label.toLowerCase()}: ${GOALS[i.p.goal].range})</span>${stepper('adjPct', t.cal.pct, 1, '%')}</label>
+    <button class="block" data-act="resetAdj">Use goal default (${GOALS[i.p.goal].pct > 0 ? '+' : ''}${GOALS[i.p.goal].pct}%)</button></div>
+  <div class="card"><h3>Macros</h3>
+    <div class="bar" style="margin:10px 0">${[['protein', 4, '#6aa9ff'], ['carbs', 4, '#f5c04a'], ['fat', 9, '#ff8f6b']].map(([k, f, c]) => `<i style="width:${g[k].g * f / (g.protein.g * 4 + g.carbs.g * 4 + g.fat.g * 9) * 100}%;background:${c}"></i>`).join('')}</div>
+    <div class="grid2">${[['Protein', 'protein', '#6aa9ff'], ['Carbs', 'carbs', '#f5c04a'], ['Fat', 'fat', '#ff8f6b'], ['Fiber', 'fiber', 'var(--muted)']].map(([n, k, c]) => `<div class="stat"><b>${r0(g[k].g)} g</b><span><span style="color:${c}">●</span> ${n}</span></div>`).join('')}</div>
+    ${['protein', 'fat', 'carbs', 'fiber'].map(k => why(g[k].why, k)).join('')}
+    <label class="f"><span>Protein (g per kg bodyweight; common range 1.6–2.2)</span>${stepper('protKg', i.p.proteinPerKg || 2.0, 0.1, 'g/kg')}</label></div>`;
+  const rev = Calc.trendReview(weightSeries(), t.tdee.kcal, t.cal.kcal);
+  h += `<div class="card"><h3>Two-week trend check</h3>`;
+  if (!rev) h += `<p class="small muted">Log your weight a few times over 2 weeks and I'll compare your actual trend with what this target implies.</p>`;
+  else if (!rev.ready) h += `<p class="small muted">Need about ${rev.daysLeft} more day${rev.daysLeft === 1 ? '' : 's'} of weight data before a review is meaningful.</p>`;
+  else {
+    const dir = rev.diff > 0 ? 'higher' : 'lower';
+    h += rev.onTrack
+      ? `<p>Your weight trend (${r2(rev.actual)} kg/week) is close to what's expected (${r2(rev.expected)} kg/week). Looks on track.</p>`
+      : `<p>Your trend is <b>${r2(rev.actual)} kg/week</b> vs. ~${r2(rev.expected)} expected — ${dir} than the target implies. If that doesn't match your goal, you might consider shifting calories by roughly ${r0(Math.abs(rev.kcalGap))} kcal/day. Your call.</p>`;
+    h += why(rev.why);
+  }
+  return h + `</div>`;
+}
+
+function lineChart(id, pts, unitFn) {
+  if (!pts.length) return '';
+  const rows = pts.slice(-120);
+  const n0 = Calc.dayNum(rows[0].date), n1 = Calc.dayNum(rows[rows.length - 1].date);
+  const W = Math.max(280, (n1 - n0) * 26 + 56), H = 190, L = 40, R = 14, T = 14, B = 26;
+  const vals = rows.flatMap(r => [r.value, r.ma]); let lo = Math.min(...vals), hi = Math.max(...vals);
+  if (hi - lo < 1) { lo -= .5; hi += .5; } const pad = (hi - lo) * .15; lo -= pad; hi += pad;
+  const x = d => L + (n1 === n0 ? (W - L - R) / 2 : (Calc.dayNum(d) - n0) / (n1 - n0) * (W - L - R));
+  const y = v => T + (hi - v) / (hi - lo) * (H - T - B);
+  const ma = rows.map((r, i) => `${i ? 'L' : 'M'}${x(r.date).toFixed(1)},${y(r.ma).toFixed(1)}`).join('');
+  let grid = ''; for (let k = 0; k <= 3; k++) { const v = lo + (hi - lo) * k / 3; grid += `<line x1="${L}" x2="${W - R}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)"/><text x="${L - 6}" y="${y(v) + 4}" text-anchor="end" font-size="11" fill="var(--muted)">${r1(unitFn(v))}</text>`; }
+  const step = Math.max(1, Math.ceil(rows.length / 6));
+  const xl = rows.map((r, i) => i % step === 0 ? `<text x="${x(r.date)}" y="${H - 8}" text-anchor="middle" font-size="11" fill="var(--muted)">${fmtDate(r.date)}</text>` : '').join('');
+  chartData[id] = { rows, unitFn };
+  return `<div class="chartbox"><svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" data-chart="${id}">${grid}${xl}
+    <path d="${ma}" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linejoin="round"/>
+    ${rows.map((r, i) => `<circle cx="${x(r.date)}" cy="${y(r.value)}" r="3.5" fill="var(--text)" opacity=".7"/><circle class="hit" data-chart="${id}" data-i="${i}" cx="${x(r.date)}" cy="${y(r.value)}" r="16" fill="transparent"/>`).join('')}</svg></div>
+    <div class="readout muted" id="ro-${id}">Tap a point · dots = daily, line = 7-day average</div>`;
+}
+const chartData = {};
+
+function viewTrends() {
+  const ws = weightSeries(), bs = bfSeries();
+  let h = `<h1>Trends</h1>`;
+  if (!ws.length) return h + `<div class="card empty"><p><b>No weight data yet</b></p><p class="small">Log your weight and a trend line with a 7-day average will appear here, so daily ups and downs don't mislead you.</p><button class="primary" data-act="logWeight">Log weight</button></div>`;
+  h += `<div class="card"><h3>Weight <span class="muted small">(${U.w()})</span></h3>${lineChart('w', ws, v => U.wToDisp(v))}
+    ${why([`Each daily weigh-in is the dot; the line is the average of all entries in the 7 days up to that date.`, `Daily weight swings of 0.5–2 kg from water, food and sodium are normal — the average is the signal.`])}</div>`;
+  if (bs.length) h += `<div class="card"><h3>Body fat % <span class="chip muted small" style="min-height:0;padding:0 8px;background:var(--card2)">estimated</span></h3>${lineChart('b', bs, v => v)}
+    <p class="small muted">Wrist-based BIA (e.g. watch sensors) is approximate — typically a few percentage points off, and sensitive to hydration. Look at the direction over weeks, not single readings.</p></div>`;
+  const dates = [...new Set(Store.list('metrics').map(m => m.date))].sort().reverse().slice(0, 12);
+  h += `<h2>Recent entries</h2><p class="tiny muted">Tap to edit · swipe left to delete</p>` + dates.map(d => {
+    const w = Store.list('metrics', 'weight').find(m => m.date === d), b = Store.list('metrics', 'bodyfat').find(m => m.date === d);
+    return `<div class="item" data-date="${d}"><div class="in" data-act="editDay" data-date="${d}"><span><b>${fmtDate(d)}</b></span><span>${w ? U.fw(w.value) : ''}${w && b ? ' · ' : ''}${b ? r1(b.value) + '% bf' : ''}</span></div></div>`;
+  }).join('');
+  return h + `<button class="primary fab" data-act="logWeight">＋ Log weight</button>`;
+}
+
+function viewSettings() {
+  const s = Store.get().settings, i = currentInputs();
+  const seg = (key, opts) => `<div class="seg">${opts.map(([v, l]) => `<button data-unit="${key}" data-v="${v}" class="${s.units[key] === v ? 'on' : ''}">${l}</button>`).join('')}</div>`;
+  const last = s.lastBackupAt ? new Date(s.lastBackupAt).toLocaleDateString() : 'never';
+  return `<h1>Settings</h1>
+  <div class="card"><h3>Profile</h3>${i.p ? `<p class="small muted">${i.p.age} y · ${i.p.sex} · ${U.fh(i.p.heightCm)} · ${GOALS[i.p.goal].label} · ${ACTIVITY[i.p.activity].label}${i.weightKg ? ' · ' + U.fw(i.weightKg) : ''}</p>` : '<p class="small muted">Not set up yet.</p>'}
+    <div class="grid2"><button data-act="profile">${i.p ? 'Edit profile' : 'Set up profile'}</button><button data-act="targets">View targets</button></div></div>
+  <div class="card"><h3>Units</h3><p class="small muted">Everything is stored in metric; units only change how it's shown.</p>
+    <p class="small" style="margin:10px 0 4px">Weight</p>${seg('weight', [['kg', 'kg'], ['lb', 'lb']])}
+    <p class="small" style="margin:10px 0 4px">Height</p>${seg('height', [['cm', 'cm'], ['in', 'in']])}
+    <p class="small" style="margin:10px 0 4px">Volume</p>${seg('volume', [['ml', 'ml'], ['oz', 'oz']])}</div>
+  <div class="card"><h3>Appearance</h3><div class="seg" style="margin-top:8px">${[['dark', 'Dark'], ['system', 'Follow system']].map(([v, l]) => `<button data-themeval="${v}" class="${s.theme === v ? 'on' : ''}">${l}</button>`).join('')}</div></div>
+  <div class="card"><h3>Backup</h3><p class="small muted">Data lives only in this browser. Last backup: ${last}. A reminder shows every 2 weeks.</p>
+    <div class="grid2"><button data-act="export" class="primary">Export JSON</button><button data-act="import">Import JSON</button></div>
+    ${!Store.isOk() ? '<p class="err">Storage is unavailable — changes will not persist.</p>' : ''}</div>
+  <div class="card"><h3>Install</h3><p class="small muted">Android Chrome: menu ⋮ → “Add to Home screen” / “Install app”. It then opens full-screen and works offline.</p></div>
+  <div class="card"><h3>Not medical advice</h3><p class="small muted">This app offers general fitness and nutrition suggestions from standard formulas. It isn't medical advice and doesn't diagnose or treat anything. Everything is a suggestion you can ignore — talk to a qualified professional about health concerns.</p></div>
+  <div class="card"><button class="block danger" data-act="reset">Erase all data</button></div>`;
+}
+
+/* ------------------------------ Sheets ------------------------------ */
+function profileSheet() {
+  const i = currentInputs(), p = i.p || { age: '', sex: 'male', heightCm: '', goal: 'maintain', activity: 'moderate' };
+  let sex = p.sex, goal = p.goal, act = p.activity;
+  const opt = (name, cur, o) => `<div class="seg" data-group="${name}">${Object.entries(o).map(([k, v]) => `<button type="button" data-v="${k}" class="${k === cur ? 'on' : ''}">${v}</button>`).join('')}</div>`;
+  openSheet(i.p ? 'Edit profile' : 'Set up profile', `
+    <label class="f"><span>Age</span>${stepper('pAge', p.age, 1, 'years')}</label>
+    <label class="f"><span>Sex (used by the BMR formula)</span></label>${opt('sex', sex, { male: 'Male', female: 'Female' })}
+    <label class="f"><span>Height (${U.h()})</span>${stepper('pH', p.heightCm ? r1(U.hToDisp(p.heightCm)) : '', U.h() === 'in' ? 0.5 : 1, U.h())}</label>
+    <label class="f"><span>Weight (${U.w()}) — logged as today's weigh-in</span>${stepper('pW', i.weightKg ? r1(U.wToDisp(i.weightKg)) : '', 0.1, U.w())}</label>
+    <label class="f"><span>Body fat % — <i>estimated</i> (optional)</span>${stepper('pBF', i.bf != null ? r1(i.bf) : '', 0.5, '%')}</label>
+    <p class="tiny muted">Confidence note: wrist BIA (e.g. from a smartwatch) is approximate — often off by several percentage points and affected by hydration. Leave blank to use a formula that doesn't need it.</p>
+    <label class="f"><span>Goal</span></label>${opt('goal', goal, Object.fromEntries(Object.entries(GOALS).map(([k, v]) => [k, v.label])))}
+    <label class="f"><span>Activity level</span></label>
+    <div id="actList">${Object.entries(ACTIVITY).map(([k, v]) => `<button type="button" class="block ${k === act ? 'primary' : ''}" data-act-lvl="${k}" style="margin:4px 0;text-align:left">${v.label} <span class="small" style="opacity:.75">· ${v.hint}</span></button>`).join('')}</div>
+    <p class="err" id="pErr"></p><button class="primary block" id="pSave">Save</button>`, sh => {
+    sh.querySelectorAll('[data-group]').forEach(g => g.addEventListener('click', e => {
+      const b = e.target.closest('button'); if (!b) return;
+      g.querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b));
+      if (g.dataset.group === 'sex') sex = b.dataset.v; else goal = b.dataset.v;
+    }));
+    sh.querySelector('#actList').addEventListener('click', e => {
+      const b = e.target.closest('button'); if (!b) return; act = b.dataset.actLvl;
+      sh.querySelectorAll('#actList button').forEach(x => x.classList.toggle('primary', x === b));
+    });
+    sh.querySelector('#pSave').addEventListener('click', () => {
+      const age = num('pAge'), h = num('pH'), w = num('pW'), bf = num('pBF');
+      const hCm = h == null ? null : U.hFromDisp(h), wKg = w == null ? null : U.wFromDisp(w);
+      let err = '';
+      if (age == null || age < 10 || age > 100 || age % 1) err = 'Enter a whole-number age between 10 and 100.';
+      else if (hCm == null || hCm < 100 || hCm > 250) err = `Enter a height between ${r0(U.hToDisp(100))} and ${r0(U.hToDisp(250))} ${U.h()}.`;
+      else if (wKg == null || wKg < 30 || wKg > 300) err = `Enter a weight between ${r0(U.wToDisp(30))} and ${r0(U.wToDisp(300))} ${U.w()}.`;
+      else if (num('pBF') == null && $('#pBF').value.trim() !== '') err = 'Body fat must be a number (or leave it blank).';
+      else if (bf != null && (bf < 3 || bf > 60)) err = 'Body fat should be between 3 and 60%.';
+      if (err) { $('#pErr').textContent = err; buzz(30); return; }
+      const goalChanged = i.p && i.p.goal !== goal;
+      persistWarn(Store.save(d => { d.profile = Object.assign({}, d.profile || {}, { age, sex, heightCm: r1(hCm), goal, activity: act,
+        calAdjPct: goalChanged || !d.profile ? null : d.profile.calAdjPct ?? null, proteinPerKg: (d.profile && d.profile.proteinPerKg) || 2.0 }); }));
+      const today = todayStr();
+      const curW = i.weightKg;
+      if (curW == null || Math.abs(curW - wKg) > 0.04) logMetric('weight', today, r2(wKg));
+      if (bf != null && (i.bf == null || Math.abs(i.bf - bf) > 0.04)) logMetric('bodyfat', today, r1(bf));
+      closeSheet(); render(); toast('Profile saved');
+    });
+  });
+}
+
+function weightSheet(date) {
+  const d = date || todayStr();
+  const w = Store.list('metrics', 'weight').find(m => m.date === d), b = Store.list('metrics', 'bodyfat').find(m => m.date === d);
+  const prev = latest('weight');
+  openSheet(date ? 'Edit entry' : 'Log weight', `
+    <label class="f"><span>Date</span><input type="date" id="wDate" value="${d}" max="${todayStr()}"></label>
+    <label class="f"><span>Weight (${U.w()})</span>${stepper('wVal', w ? r1(U.wToDisp(w.value)) : prev ? r1(U.wToDisp(prev.value)) : '', 0.1, U.w())}</label>
+    <label class="f"><span>Body fat % — <i>estimated</i> (optional)</span>${stepper('bVal', b ? r1(b.value) : '', 0.5, '%')}</label>
+    <p class="tiny muted">Estimated by your watch's wrist BIA — approximate; watch the trend, not single readings.</p>
+    <p class="err" id="wErr"></p>
+    <button class="primary block" id="wSave">Save</button>
+    ${w || b ? '<button class="block danger" id="wDel" style="margin-top:8px">Delete this day</button>' : ''}`, sh => {
+    sh.querySelector('#wSave').addEventListener('click', () => {
+      const date2 = $('#wDate').value, wv = num('wVal'), bv = num('bVal');
+      const kg = wv == null ? null : U.wFromDisp(wv);
+      let err = '';
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(date2) || date2 > todayStr()) err = 'Pick a date that is today or earlier.';
+      else if (kg == null || kg < 30 || kg > 300) err = `Enter a weight between ${r0(U.wToDisp(30))} and ${r0(U.wToDisp(300))} ${U.w()}.`;
+      else if (bv == null && $('#bVal').value.trim() !== '') err = 'Body fat must be a number (or leave it blank).';
+      else if (bv != null && (bv < 3 || bv > 60)) err = 'Body fat should be between 3 and 60%.';
+      if (err) { $('#wErr').textContent = err; buzz(30); return; }
+      if (date && date2 !== date) removeDay(date);
+      persistWarn(logMetric('weight', date2, r2(kg)));
+      if (bv != null) logMetric('bodyfat', date2, r1(bv));
+      else if (date) { const old = Store.list('metrics', 'bodyfat').find(m => m.date === date2); if (old) Store.del('metrics', old.id); }
+      closeSheet(); render(); toast('Saved'); buzz(15);
+    });
+    const del = sh.querySelector('#wDel');
+    if (del) del.addEventListener('click', () => { closeSheet(); deleteDay(d); });
+  });
+}
+function removeDay(d) { Store.list('metrics').filter(m => m.date === d).forEach(m => Store.del('metrics', m.id)); }
+function deleteDay(d) {
+  const removed = Store.list('metrics').filter(m => m.date === d);
+  removeDay(d); render();
+  toast('Entry deleted', () => { removed.forEach(m => Store.put('metrics', m)); render(); });
+}
+
+/* ------------------------------ Export / import ------------------------------ */
+function doExport() {
+  try {
+    const blob = new Blob([JSON.stringify(Store.exportObject(), null, 2)], { type: 'application/json' });
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+    a.download = `fitness-backup-${todayStr()}.json`; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+    Store.save(d => { d.settings.lastBackupAt = nowISO(); });
+    render(); toast('Backup exported');
+  } catch (e) { toast('Export failed on this browser.'); }
+}
+function doImport(file) {
+  const rd = new FileReader();
+  rd.onload = () => {
+    let data;
+    try { data = JSON.parse(rd.result); } catch (e) { return toast('That file is not valid JSON.'); }
+    const err = validateImport(data); if (err) return toast(err);
+    openSheet('Replace current data?', `<p>This backup has <b>${(data.metrics || []).length}</b> weight/body-fat entries${data.profile ? ' and a profile' : ''}.</p><p class="small muted">Importing replaces what's on this device. Export a backup first if you're unsure.</p>
+      <button class="primary block" id="impOk">Replace with backup</button><button class="block" data-act="closeSheet" style="margin-top:8px">Cancel</button>`, sh => {
+      sh.querySelector('#impOk').addEventListener('click', () => {
+        persistWarn(Store.replaceAll({ schemaVersion: data.schemaVersion, settings: data.settings, profile: data.profile, metrics: data.metrics }));
+        closeSheet(); applyTheme(); render(); toast('Backup imported');
+      });
+    });
+  };
+  rd.onerror = () => toast('Could not read that file.');
+  rd.readAsText(file);
+}
+
+/* ------------------------------ Events ------------------------------ */
+document.addEventListener('click', e => {
+  const t = e.target;
+  const tabBtn = t.closest('[data-tab]'); if (tabBtn) return go(tabBtn.dataset.tab);
+  const st = t.closest('[data-step]');
+  if (st) {
+    const inp = $('#' + st.dataset.step), d = parseFloat(st.dataset.d);
+    const cur = parseFloat(String(inp.value).replace(',', '.')); const base = isFinite(cur) ? cur : 0;
+    inp.value = r2(base + d); buzz(8);
+    if (st.dataset.step === 'adjPct' || st.dataset.step === 'protKg') inp.dispatchEvent(new Event('change'));
+    return;
+  }
+  const u = t.closest('[data-unit]');
+  if (u) { Store.save(d => { d.settings.units[u.dataset.unit] = u.dataset.v; }); return render(); }
+  const th = t.closest("[data-themeval]");
+  if (th) { Store.save(d => { d.settings.theme = th.dataset.themeval; }); applyTheme(); return render(); }
+  if (t.closest('#backdrop')) return closeSheet();
+  const a = t.closest('[data-act]'); if (!a) return;
+  if (a.closest('.item') && swiped) return;
+  switch (a.dataset.act) {
+    case 'closeSheet': closeSheet(); break;
+    case 'undo': if (toastUndo) toastUndo(); $('#toast').classList.remove('on'); break;
+    case 'profile': closeSheet(); profileSheet(); break;
+    case 'logWeight': weightSheet(); break;
+    case 'editDay': weightSheet(a.dataset.date); break;
+    case 'targets': go(tab, 'targets'); break;
+    case 'back': go(tab); break;
+    case 'export': doExport(); break;
+    case 'import': $('#importFile').value = ''; $('#importFile').click(); break;
+    case 'resetAdj': saveProfileField('calAdjPct', null); break;
+    case 'reset':
+      openSheet('Erase all data?', `<p>This deletes your profile and every logged entry on this device. It can't be undone — consider exporting a backup first.</p>
+        <button class="block danger" id="rstOk">Yes, erase everything</button><button class="block" data-act="closeSheet" style="margin-top:8px">Cancel</button>`, sh =>
+        sh.querySelector('#rstOk').addEventListener('click', () => { Store.reset(); applyTheme(); closeSheet(); go('today'); toast('All data erased'); }));
+      break;
+  }
+  // chart tap
+  });
+document.addEventListener('click', e => {
+  const hit = e.target.closest('.hit'); if (!hit) return;
+  const c = chartData[hit.dataset.chart], r = c.rows[+hit.dataset.i];
+  const ro = $('#ro-' + hit.dataset.chart);
+  ro.innerHTML = `<b>${fmtDate(r.date)}</b> · daily ${r1(c.unitFn(r.value))} · 7-day avg ${r1(c.unitFn(r.ma))}`; buzz(8);
+});
+document.addEventListener('change', e => {
+  if (e.target.id === 'adjPct') { const v = num('adjPct'); if (v == null || v < -40 || v > 30) { toast('Adjustment should be between −40% and +30%.'); return render(); } saveProfileField('calAdjPct', v); }
+  if (e.target.id === 'protKg') { const v = num('protKg'); if (v == null || v < 0.8 || v > 3.5) { toast('Protein should be between 0.8 and 3.5 g/kg.'); return render(); } saveProfileField('proteinPerKg', r1(v)); }
+  if (e.target.id === 'importFile' && e.target.files[0]) doImport(e.target.files[0]);
+});
+function saveProfileField(k, v) { persistWarn(Store.save(d => { if (d.profile) d.profile[k] = v; })); const y = $('#main').scrollTop; render(); $('#main').scrollTop = y; }
+
+// Swipe left to delete (with undo toast).
+let swiped = false;
+(() => {
+  let row = null, x0 = 0, dx = 0, y0 = 0, lock = null;
+  document.addEventListener('touchstart', e => {
+    const r = e.target.closest('.item'); if (!r) return; row = r.querySelector('.in'); x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; dx = 0; lock = null; swiped = false; row.style.transition = 'none';
+  }, { passive: true });
+  document.addEventListener('touchmove', e => {
+    if (!row) return; dx = e.touches[0].clientX - x0; const dy = e.touches[0].clientY - y0;
+    if (lock == null && (Math.abs(dx) > 8 || Math.abs(dy) > 8)) lock = Math.abs(dx) > Math.abs(dy) ? 'x' : 'y';
+    if (lock === 'x') { row.style.transform = `translateX(${Math.min(0, dx)}px)`; swiped = true; }
+  }, { passive: true });
+  document.addEventListener('touchend', () => {
+    if (!row) return; const r = row; row = null; r.style.transition = '';
+    if (lock === 'x' && dx < -90) { r.style.transform = 'translateX(-110%)'; setTimeout(() => deleteDay(r.parentElement.dataset.date), 150); }
+    else r.style.transform = '';
+    setTimeout(() => { swiped = false; }, 50);
+  });
+})();
+
+/* ------------------------------ Boot ------------------------------ */
+applyTheme();
+render();
+if (!Store.get().profile) profileSheet();
+if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+}
+</script>
+</body>
+</html>
