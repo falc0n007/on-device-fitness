@@ -53,7 +53,7 @@ nav button span{font-size:20px;line-height:1}nav button.on{color:var(--accent);f
 #sheet{position:fixed;left:0;right:0;bottom:0;max-width:640px;margin:0 auto;max-height:90dvh;overflow-y:auto;background:var(--card);border-radius:20px 20px 0 0;z-index:31;padding:8px 16px calc(20px + env(safe-area-inset-bottom));transform:translateY(105%);transition:transform .22s ease;box-shadow:var(--shadow)}
 #sheet.on{transform:none}
 #sheet .grab{width:40px;height:5px;background:var(--line);border-radius:3px;margin:4px auto 10px}
-#toast{position:fixed;left:16px;right:16px;bottom:calc(84px + env(safe-area-inset-bottom));z-index:40;max-width:608px;margin:0 auto;background:var(--card2);border:1px solid var(--line);border-radius:14px;padding:6px 6px 6px 16px;display:none;align-items:center;justify-content:space-between;gap:8px;box-shadow:var(--shadow)}
+#toast{position:fixed;left:16px;right:16px;bottom:calc(146px + env(safe-area-inset-bottom));z-index:40;max-width:608px;margin:0 auto;background:var(--card2);border:1px solid var(--line);border-radius:14px;padding:6px 6px 6px 16px;display:none;align-items:center;justify-content:space-between;gap:8px;box-shadow:var(--shadow)}
 #toast.on{display:flex}
 .chartwrap{display:flex;background:var(--card2);border-radius:12px;overflow:hidden}.chartwrap .axis{flex:0 0 38px}.chartbox{flex:1;min-width:0;overflow-x:auto;overflow-y:hidden}
 .chartbox svg{display:block}
@@ -82,10 +82,10 @@ nav button span{font-size:20px;line-height:1}nav button.on{color:var(--accent);f
 .setrow select.rpe{width:150px;min-height:48px;padding:0 6px}
 .chk{width:56px;font-size:24px;padding:0}.chk.on{background:var(--accent);color:var(--accent-ink)}
 #restBar{position:fixed;left:12px;right:12px;bottom:calc(66px + env(safe-area-inset-bottom));max-width:616px;margin:0 auto;z-index:25;background:var(--card);border:2px solid var(--accent);border-radius:14px;padding:6px 10px;display:none;align-items:center;justify-content:space-between;gap:8px;box-shadow:var(--shadow);overflow:hidden;font-size:16px}
-#restBar.on{display:flex}body.resting main{padding-bottom:150px}body.resting #toast{bottom:calc(138px + env(safe-area-inset-bottom))}body.resting .fab{bottom:calc(138px + env(safe-area-inset-bottom))}#restBar button{min-height:48px;padding:0 12px}
+#restBar.on{display:flex}body.resting main{padding-bottom:150px}body.resting #toast{bottom:calc(210px + env(safe-area-inset-bottom))}body.resting .fab{bottom:calc(138px + env(safe-area-inset-bottom))}#restBar button{min-height:48px;padding:0 12px}
 #restBar i{position:absolute;left:0;bottom:0;height:4px;background:var(--accent)}
 .tbl{border-collapse:collapse;width:100%;font-size:14px}.tbl td,.tbl th{padding:6px 8px;border-bottom:1px solid var(--line);text-align:left}
-textarea{font:inherit}
+textarea{font:inherit;font-size:16px;width:100%;background:var(--card2);color:var(--text);border:1px solid var(--line);border-radius:12px;padding:10px;resize:vertical}
 .item>.in[data-act]{cursor:pointer}
 
 /* ---- design pass: consistent spacing, button hierarchy, thumb-zone actions ---- */
@@ -129,6 +129,7 @@ body.resting .dock{bottom:calc(140px + env(safe-area-inset-bottom))}
 .list-row{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:6px 0}
 .sheetnote{margin:4px 0 0}.fld>span{flex:1;min-width:0}.stat b{font-size:20px}.row.sp>h2.sec{margin:0 4px}.row.sp:has(>h2.sec){margin-top:22px}
 #sheet{padding-top:6px}#sheet>.row.sp{margin-bottom:6px}#sheet>.row.sp h2{margin:4px 0;font-size:19px}
+.rline{display:flex;align-items:center;gap:8px;padding:8px 0;border-top:1px solid var(--line)}.rline .tx{flex:1;min-width:0}.rline.bad{background:rgba(255,107,107,.08);border-radius:10px;padding:8px}.rbtns{display:flex;flex-direction:column;align-items:flex-end}.rbtns .link{min-height:36px;font-size:13px}
 @media (orientation:landscape) and (max-height:500px){nav button{min-height:48px;flex-direction:row;justify-content:center;gap:6px}main{padding-bottom:72px}.fab{bottom:calc(60px + env(safe-area-inset-bottom))}}
 </style>
 </head>
@@ -146,14 +147,15 @@ body.resting .dock{bottom:calc(140px + env(safe-area-inset-bottom))}
 'use strict';
 
 /* ===========================================================================
- * EXPORT FORMAT (schemaVersion 2) — a companion script may write the same shape and import it:
+ * EXPORT FORMAT (schemaVersion 3) — a companion script may write the same shape and import it:
  * {
- *   "app": "on-device-fitness", "schemaVersion": 2, "exportedAt": ISO timestamp,
+ *   "app": "on-device-fitness", "schemaVersion": 3, "exportedAt": ISO timestamp,
  *   "settings": { units:{weight:"kg|lb",height:"cm|in",volume:"ml|oz"}, theme, plateInc(kg), stepGoal, waterMlPerKg, ... },
  *   "profile":  { age, sex:"male|female", heightCm, goal:"cut|maintain|lean_bulk|recomp", activity, calAdjPct:number|null, proteinPerKg } | null,
  *   "metrics":  [ { id, type:"weight|bodyfat|water|steps", date:"YYYY-MM-DD", value (kg | % | ml | steps), source:"manual", createdAt, updatedAt } ],
  *   "entries":  food log [ { id, date, meal, name, accuracy:"exact|good|rough", kcal, protein, carbs, fat, fiber, sodium(mg), addedSugar, naturalSugar, flags[], source, createdAt, updatedAt } ],
- *   "customFoods", "savedMeals", "customExercises", "splits" [ { id, name, days:[{dow 0-6 (Mon=0), name, rest, exercises:[{exId, sets, repMin, repMax}]}] } ],
+ *   "recipes" [ { id, name, servings, cookedG|null, lines:[{text:"200 g raw chicken breast", foodId?, state?, gramsOverride?, fixed?}] } ]  (nutrition is derived from the lines),
+ *   "customFoods", "customExercises", "splits" [ { id, name, days:[{dow 0-6 (Mon=0), name, rest, exercises:[{exId, sets, repMin, repMax}]}] } ],
  *   "sessions": [ { id, date, dayName, status:"active|done", sets:[{id, exId, weight(kg), reps, rpe, note, done, source, createdAt, updatedAt}] } ]
  * }
  * All values are metric. Time-based metrics are simple dated entries so imported data can slot in.
@@ -161,15 +163,21 @@ body.resting .dock{bottom:calc(140px + env(safe-area-inset-bottom))}
  * =========================================================================== */
 
 /* ------------------------------ Storage layer ------------------------------ */
-const SCHEMA_VERSION = 2;
-const COLLS = ['metrics', 'entries', 'customFoods', 'savedMeals', 'splits', 'customExercises', 'sessions'];
+const SCHEMA_VERSION = 3;
+const COLLS = ['metrics', 'entries', 'customFoods', 'savedMeals', 'splits', 'customExercises', 'sessions', 'recipes'];
 const SETTING_DEFAULTS = {
   theme: 'dark', lastBackupAt: null, plateInc: 2.5, wakeLock: true, stepGoal: 8000, stepKcalPerKgStep: 0.0005, useStepsInTdee: false,
   waterMlPerKg: 35, waterTrainingBonus: 500, sodiumLo: 1500, sodiumHi: 2300, addedSugarLimit: null, sessionMinutes: 60,
   currentSplitId: null, targetSplitId: null, workoutPrompted: false, exLinks: {}, favFoods: [], dismissed: {}, flaggedJoints: [], restSeconds: 120
 };
+const NUTS_KEYS = ['kcal', 'protein', 'carbs', 'fat', 'fiber', 'sodium', 'addedSugar', 'naturalSugar'];
 const MIGRATIONS = {
-  1: d => { COLLS.forEach(c => { d[c] = d[c] || []; }); return d; } // v1 → v2: food, workout and steps/water collections
+  1: d => { COLLS.forEach(c => { d[c] = d[c] || []; }); return d; }, // v1 → v2: food, workout and steps/water collections
+  2: d => { // v2 → v3: saved meals become 1-serving recipes with fixed nutrition lines
+    d.recipes = d.recipes || [];
+    (d.savedMeals || []).forEach(m => d.recipes.push({ id: m.id, name: m.name, servings: 1, cookedG: null, source: m.source || 'manual', createdAt: m.createdAt, updatedAt: m.updatedAt,
+      lines: (m.items || []).map(i => ({ text: i.name, fixed: NUTS_KEYS.reduce((o, k) => { o[k] = i[k] || 0; return o; }, { flags: i.flags || [], grams: i.grams || null }) })) }));
+    d.savedMeals = []; return d; }
 };
 
 function migrate(data) {
@@ -558,6 +566,20 @@ Fish tacos;80,160,240;190,12,19,7,2,350,1,1.5;o3;;
 Beef chili;200,300,450;110,9,10,4,3.5,420,1,3;fe,k;240;
 Greek salad with feta;150,250,350;85,3,5,6.5,1.5,350,0,3;ca,c;;
 Salmon with rice and vegetables;250,350,500;150,12,14,5.5,1.5,200,0,1;o3,d,k;;
+Onion;60,110,150;40,1.1,9.3,0.1,1.7,4,0,4.2;;160;
+Garlic;3,3,9;149,6.4,33,0.5,2.1,17,0,1;;;
+Tomato sauce;60,125,250;29,1.3,6.7,0.2,1.6,420,0,4.5;c,k;245;
+Sugar, white;4,12,25;387,0,100,0,0,1,100,0;;200;
+Wheat flour;8,30,60;364,10,76,1,2.7,2,0,0.3;fe;125;
+Coconut milk, canned;60,120,240;197,2,2.8,21,0,13,0,2.8;;240;
+Heavy cream;15,30,60;340,2.1,2.8,36,0,38,0,2.9;ca;238;
+Salt;1,3,6;0,0,0,0,0,38758,0,0;;;
+Chicken stock;100,240,480;5,0.5,0.4,0.2,0,340,0,0.3;;240;
+Bacon, cooked;8,16,32;541,37,1.4,42,0,1717,0,0;;;
+Cocoa powder;5,7,14;228,20,58,14,33,21,0,2;mg,fe;;
+Maple syrup;7,20,40;260,0,67,0,0,12,67,0;;;
+Parmesan cheese;5,10,20;431,38,4,29,0,1529,0,0.9;ca;;
+Lemon juice;15,15,30;22,0.4,6.9,0.2,0.3,1,0,2.5;c;;
 `.trim().split('\n').map(l => l.split(';')).map(a => {
   const [kcal, p, c, f, fib, na, add, nat] = a[2].split(',').map(Number), [s, m, l] = a[1].split(',').map(Number);
   return { id: 'b:' + a[0], name: a[0], portions: { small: s, medium: m, large: l }, per100: { kcal, protein: p, carbs: c, fat: f, fiber: fib, sodium: na, addedSugar: add, naturalSugar: nat },
@@ -935,6 +957,186 @@ Object.assign(Calc, {
 });
 const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
 
+/* ---------------- Ingredient knowledge graph + recipe maths (pure, no DOM) ----------------
+ * Nodes:  foods (built-in + custom).
+ * Edges:  ALIAS   "chicken" → Chicken breast, cooked          (words people actually type)
+ *         YIELD   raw/dry → cooked weight factor              (200 g raw rice → 600 g cooked rice)
+ *         UNIT    food → grams per tbsp / piece / cup          (1 tbsp olive oil = 14 g)
+ *         DISH    "stir fry" → typical ingredient list         (templates you can edit)
+ * Every derived number carries a human-readable "why" so it can be shown in the UI. */
+const KG = {
+  alias: {
+    'chicken': 'Chicken breast, cooked', 'chicken breast': 'Chicken breast, cooked', 'chicken breasts': 'Chicken breast, cooked', 'chicken fillet': 'Chicken breast, cooked', 'chicken thigh': 'Chicken thigh, cooked', 'chicken thighs': 'Chicken thigh, cooked',
+    'turkey': 'Turkey breast, cooked', 'turkey breast': 'Turkey breast, cooked', 'ground beef': 'Lean ground beef, cooked', 'minced beef': 'Lean ground beef, cooked', 'beef mince': 'Lean ground beef, cooked', 'mince': 'Lean ground beef, cooked', 'beef': 'Lean ground beef, cooked',
+    'steak': 'Sirloin steak, cooked', 'sirloin': 'Sirloin steak, cooked', 'pork': 'Pork loin, cooked', 'pork loin': 'Pork loin, cooked', 'salmon': 'Salmon, cooked', 'salmon fillet': 'Salmon, cooked', 'tuna': 'Tuna, canned in water', 'canned tuna': 'Tuna, canned in water',
+    'cod': 'White fish (cod), cooked', 'white fish': 'White fish (cod), cooked', 'fish': 'White fish (cod), cooked', 'shrimp': 'Shrimp, cooked', 'prawns': 'Shrimp, cooked', 'prawn': 'Shrimp, cooked',
+    'egg': 'Egg, whole', 'eggs': 'Egg, whole', 'whole egg': 'Egg, whole', 'egg white': 'Egg whites', 'egg whites': 'Egg whites', 'tofu': 'Tofu, firm', 'tempeh': 'Tempeh',
+    'greek yogurt': 'Greek yogurt, plain nonfat', 'greek yoghurt': 'Greek yogurt, plain nonfat', 'yogurt': 'Greek yogurt, plain nonfat', 'yoghurt': 'Greek yogurt, plain nonfat', 'cottage cheese': 'Cottage cheese, low-fat',
+    'milk': 'Milk, 2%', 'soy milk': 'Soy milk, unsweetened', 'almond milk': 'Almond milk, unsweetened', 'protein powder': 'Whey protein powder', 'whey': 'Whey protein powder', 'whey protein': 'Whey protein powder', 'protein scoop': 'Whey protein powder',
+    'cheddar': 'Cheddar cheese', 'cheese': 'Cheddar cheese', 'mozzarella': 'Mozzarella cheese', 'parmesan': 'Parmesan cheese',
+    'lentils': 'Lentils, cooked', 'lentil': 'Lentils, cooked', 'black beans': 'Black beans, cooked', 'beans': 'Black beans, cooked', 'kidney beans': 'Black beans, cooked', 'chickpeas': 'Chickpeas, cooked', 'garbanzo beans': 'Chickpeas, cooked', 'edamame': 'Edamame',
+    'peanut butter': 'Peanut butter', 'almonds': 'Almonds', 'almond': 'Almonds', 'walnuts': 'Walnuts', 'chia': 'Chia seeds', 'chia seeds': 'Chia seeds', 'flax': 'Ground flaxseed', 'flaxseed': 'Ground flaxseed',
+    'rice': 'White rice, cooked', 'white rice': 'White rice, cooked', 'basmati rice': 'White rice, cooked', 'basmati': 'White rice, cooked', 'jasmine rice': 'White rice, cooked', 'brown rice': 'Brown rice, cooked',
+    'oats': 'Rolled oats, dry', 'rolled oats': 'Rolled oats, dry', 'porridge oats': 'Rolled oats, dry', 'oatmeal': 'Oatmeal, cooked', 'porridge': 'Oatmeal, cooked',
+    'pasta': 'Pasta, cooked', 'spaghetti': 'Pasta, cooked', 'penne': 'Pasta, cooked', 'macaroni': 'Pasta, cooked', 'noodles': 'Pasta, cooked', 'bread': 'Whole-wheat bread', 'whole wheat bread': 'Whole-wheat bread', 'toast': 'Whole-wheat bread', 'white bread': 'White bread',
+    'tortilla': 'Flour tortilla', 'wrap': 'Flour tortilla', 'bagel': 'Bagel', 'potato': 'Baked potato', 'potatoes': 'Baked potato', 'sweet potato': 'Sweet potato, baked', 'sweet potatoes': 'Sweet potato, baked', 'quinoa': 'Quinoa, cooked',
+    'banana': 'Banana', 'bananas': 'Banana', 'apple': 'Apple', 'apples': 'Apple', 'orange': 'Orange', 'blueberries': 'Blueberries', 'blueberry': 'Blueberries', 'berries': 'Blueberries', 'strawberries': 'Strawberries', 'grapes': 'Grapes', 'mango': 'Mango', 'avocado': 'Avocado', 'raisins': 'Raisins', 'dates': 'Dates',
+    'broccoli': 'Broccoli, cooked', 'spinach': 'Spinach, raw', 'carrot': 'Carrots', 'carrots': 'Carrots', 'tomato': 'Tomato', 'tomatoes': 'Tomato', 'cucumber': 'Cucumber', 'bell pepper': 'Bell pepper', 'peppers': 'Bell pepper', 'pepper': 'Bell pepper', 'capsicum': 'Bell pepper',
+    'lettuce': 'Mixed salad greens', 'salad': 'Mixed salad greens', 'salad greens': 'Mixed salad greens', 'green beans': 'Green beans, cooked', 'cauliflower': 'Cauliflower, cooked', 'mushroom': 'Mushrooms', 'mushrooms': 'Mushrooms', 'corn': 'Corn, cooked', 'peas': 'Green peas, cooked',
+    'onion': 'Onion', 'onions': 'Onion', 'garlic': 'Garlic', 'olive oil': 'Olive oil', 'oil': 'Olive oil', 'vegetable oil': 'Olive oil', 'cooking oil': 'Olive oil', 'butter': 'Butter', 'mayo': 'Mayonnaise', 'mayonnaise': 'Mayonnaise',
+    'hummus': 'Hummus', 'honey': 'Honey', 'jam': 'Jam', 'ketchup': 'Ketchup', 'soy sauce': 'Soy sauce', 'dark chocolate': 'Dark chocolate (70%)', 'chocolate': 'Milk chocolate', 'sugar': 'Sugar, white', 'flour': 'Wheat flour', 'plain flour': 'Wheat flour', 'salt': 'Salt',
+    'tomato sauce': 'Tomato sauce', 'passata': 'Tomato sauce', 'marinara': 'Tomato sauce', 'pasta sauce': 'Tomato sauce', 'canned tomatoes': 'Tomato sauce', 'coconut milk': 'Coconut milk, canned', 'cream': 'Heavy cream', 'heavy cream': 'Heavy cream',
+    'stock': 'Chicken stock', 'broth': 'Chicken stock', 'chicken stock': 'Chicken stock', 'bacon': 'Bacon, cooked', 'cocoa': 'Cocoa powder', 'cocoa powder': 'Cocoa powder', 'maple syrup': 'Maple syrup', 'lemon juice': 'Lemon juice', 'orange juice': 'Orange juice'
+  },
+  /** cooked weight ÷ raw/dry weight */
+  yield: { 'Chicken breast, cooked': 0.75, 'Chicken thigh, cooked': 0.72, 'Turkey breast, cooked': 0.75, 'Lean ground beef, cooked': 0.72, 'Sirloin steak, cooked': 0.75, 'Pork loin, cooked': 0.75, 'Salmon, cooked': 0.8, 'White fish (cod), cooked': 0.8, 'Shrimp, cooked': 0.85,
+    'White rice, cooked': 3.0, 'Brown rice, cooked': 2.8, 'Pasta, cooked': 2.2, 'Quinoa, cooked': 3.0, 'Lentils, cooked': 2.5, 'Black beans, cooked': 2.4, 'Chickpeas, cooked': 2.4, 'Baked potato': 0.85, 'Sweet potato, baked': 0.85, 'Bacon, cooked': 0.35 },
+  tbsp: { 'Olive oil': 14, 'Butter': 14, 'Peanut butter': 16, 'Honey': 21, 'Sugar, white': 12.5, 'Wheat flour': 8, 'Soy sauce': 16, 'Mayonnaise': 14, 'Jam': 20, 'Ketchup': 17, 'Chia seeds': 12, 'Ground flaxseed': 7, 'Rolled oats, dry': 5.5, 'Salt': 18, 'Cocoa powder': 5.4, 'Maple syrup': 20, 'Hummus': 15, 'Heavy cream': 15, 'Whey protein powder': 7.5, 'Greek yogurt, plain nonfat': 15, 'Parmesan cheese': 5 },
+  can: { 'Tuna, canned in water': 140, 'Coconut milk, canned': 400, 'Tomato sauce': 400, 'Black beans, cooked': 240, 'Chickpeas, cooked': 240, 'Lentils, cooked': 240, 'Green peas, cooked': 250, 'Corn, cooked': 250 },
+  piece: { 'Whole-wheat bread': 30, 'White bread': 28, 'Garlic': 3, 'Bacon, cooked': 8, 'Dates': 12, 'Almonds': 1.2, 'Mozzarella cheese': 28, 'Cheddar cheese': 28, 'Whey protein powder': 30, 'Flour tortilla': 60, 'Egg whites': 33, 'Banana': 118 },
+  density: { 'Olive oil': 0.92, 'Milk, 2%': 1.03, 'Honey': 1.42, 'Soy milk, unsweetened': 1.03, 'Almond milk, unsweetened': 1.0, 'Heavy cream': 0.99, 'Maple syrup': 1.33, 'Soy sauce': 1.15 },
+  stateRaw: /\b(raw|uncooked|dry|dried|dehydrated)\b/, stateCooked: /\b(cooked|boiled|steamed|roasted|grilled|baked|leftover|canned|tinned|drained|fried)\b/,
+  filler: /\b(finely|roughly|thinly|freshly|fresh|frozen|chopped|diced|sliced|minced|grated|shredded|crushed|ground|peeled|boneless|skinless|lean|extra|virgin|organic|plain|unsweetened|low|fat|free|reduced|nonfat|large|medium|small|raw|uncooked|dry|dried|cooked|boiled|steamed|roasted|grilled|baked|canned|tinned|drained|of|a|an|the|some|about|approx|approximately)\b/g,
+  /** Typical dishes as ingredient lines (editable templates). */
+  dishes: [
+    { name: 'Chicken stir-fry with rice', aka: ['stir fry', 'stirfry', 'chicken stir'], servings: 2, lines: ['300 g raw chicken breast', '200 g broccoli', '1 bell pepper', '1 tbsp soy sauce', '1 tbsp olive oil', '150 g dry white rice'] },
+    { name: 'Spaghetti bolognese', aka: ['bolognese', 'bolognaise', 'spag bol', 'spaghetti'], servings: 4, lines: ['400 g raw lean ground beef', '300 g dry pasta', '400 g tomato sauce', '1 onion', '2 cloves garlic', '1 tbsp olive oil'] },
+    { name: 'Chicken burrito bowl', aka: ['burrito', 'burrito bowl'], servings: 2, lines: ['300 g raw chicken breast', '100 g dry white rice', '1 cup black beans', '1 avocado', '1 tomato', '1 tbsp olive oil'] },
+    { name: 'Veggie omelette', aka: ['omelette', 'omelet'], servings: 1, lines: ['3 large eggs', '50 g mushrooms', '30 g spinach', '20 g cheddar cheese', '1 tsp butter'] },
+    { name: 'Overnight oats', aka: ['oats', 'overnight oat'], servings: 1, lines: ['50 g rolled oats', '150 ml milk', '100 g greek yogurt', '60 g blueberries', '1 tbsp chia seeds'] },
+    { name: 'Protein smoothie', aka: ['smoothie', 'protein shake', 'shake'], servings: 1, lines: ['1 scoop whey protein', '1 banana', '250 ml milk', '1 tbsp peanut butter'] },
+    { name: 'Chicken curry', aka: ['curry'], servings: 4, lines: ['500 g raw chicken thigh', '1 can coconut milk', '2 onions', '3 cloves garlic', '200 g tomato sauce', '1 tbsp olive oil', '300 g dry white rice'] },
+    { name: 'Beef chili', aka: ['chili', 'chilli'], servings: 4, lines: ['500 g raw lean ground beef', '1 can black beans', '400 g tomato sauce', '1 onion', '1 bell pepper', '1 tbsp olive oil'] },
+    { name: 'Tuna salad sandwich', aka: ['tuna sandwich', 'tuna salad'], servings: 1, lines: ['1 can tuna', '1 tbsp mayonnaise', '2 slices whole wheat bread', '30 g mixed salad greens'] },
+    { name: 'Greek yogurt parfait', aka: ['parfait', 'yogurt bowl'], servings: 1, lines: ['200 g greek yogurt', '40 g granola', '80 g strawberries', '1 tsp honey'] },
+    { name: 'Salmon, rice and veg', aka: ['salmon dinner', 'salmon bowl'], servings: 2, lines: ['300 g raw salmon', '150 g dry white rice', '250 g broccoli', '1 tbsp olive oil'] },
+    { name: 'Lentil soup', aka: ['soup', 'dal', 'dhal'], servings: 4, lines: ['250 g dry lentils', '2 carrots', '1 onion', '2 cloves garlic', '500 ml stock', '1 tbsp olive oil'] },
+    { name: 'Peanut butter banana toast', aka: ['pb toast', 'banana toast'], servings: 1, lines: ['2 slices whole wheat bread', '2 tbsp peanut butter', '1 banana'] },
+    { name: 'Fried rice with egg', aka: ['fried rice'], servings: 2, lines: ['200 g dry white rice', '3 eggs', '100 g green peas', '1 tbsp soy sauce', '1 tbsp olive oil', '1 onion'] },
+    { name: 'Pancakes', aka: ['pancake'], servings: 3, lines: ['150 g flour', '2 eggs', '250 ml milk', '1 tbsp sugar', '1 tbsp butter'] }
+  ]
+};
+const FRACS = { '½': ' 1/2', '¼': ' 1/4', '¾': ' 3/4', '⅓': ' 1/3', '⅔': ' 2/3' };
+const UNIT_WORDS = { g: 'g', gram: 'g', grams: 'g', kg: 'kg', kgs: 'kg', kilogram: 'kg', kilograms: 'kg', oz: 'oz', ounce: 'oz', ounces: 'oz', lb: 'lb', lbs: 'lb', pound: 'lb', pounds: 'lb', ml: 'ml', milliliter: 'ml', milliliters: 'ml', l: 'l', liter: 'l', liters: 'l', litre: 'l', litres: 'l',
+  cup: 'cup', cups: 'cup', c: 'cup', tbsp: 'tbsp', tbsps: 'tbsp', tbs: 'tbsp', tablespoon: 'tbsp', tablespoons: 'tbsp', tsp: 'tsp', tsps: 'tsp', teaspoon: 'tsp', teaspoons: 'tsp', pinch: 'pinch', pinches: 'pinch', dash: 'pinch', dashes: 'pinch',
+  slice: 'piece', slices: 'piece', clove: 'piece', cloves: 'piece', piece: 'piece', pieces: 'piece', stick: 'piece', sticks: 'piece', can: 'can', cans: 'can', tin: 'can', tins: 'can', scoop: 'scoop', scoops: 'scoop', handful: 'handful', handfuls: 'handful' };
+
+Object.assign(Calc, {
+  /** "2 large eggs", "1 1/2 cups cooked rice", "200g raw chicken breast (about 2 breasts)" → {qty, unit, size, name, state, explicitG} */
+  parseIngredient(line) {
+    let t = String(line).replace(/[½¼¾⅓⅔]/g, m => FRACS[m]).replace(/^[-•*·]\s*/, '').replace(/\s+/g, ' ').trim();
+    if (!t) return null;
+    const lower = t.toLowerCase();
+    let explicitG = null; const pm = lower.match(/\((?:about |approx\.? )?(\d+(?:\.\d+)?)\s*(g|ml|oz)\)/);
+    if (pm) explicitG = pm[2] === 'oz' ? +pm[1] * 28.35 : +pm[1];
+    t = lower.replace(/\([^)]*\)/g, ' ').replace(/,.*$/, '').replace(/\s+/g, ' ').trim();
+    let qty = null, rest = t;
+    const range = rest.match(/^(\d+(?:\.\d+)?)\s*(?:-|–|to)\s*(\d+(?:\.\d+)?)\s*(.*)$/);
+    const mixed = rest.match(/^(\d+)\s+(\d+)\/(\d+)\s*(.*)$/), frac = rest.match(/^(\d+)\/(\d+)\s*(.*)$/), dec = rest.match(/^(\d+(?:[.,]\d+)?)\s*(.*)$/);
+    if (range) { qty = (+range[1] + +range[2]) / 2; rest = range[3]; }
+    else if (mixed) { qty = +mixed[1] + mixed[2] / mixed[3]; rest = mixed[4]; }
+    else if (frac) { qty = frac[1] / frac[2]; rest = frac[3]; }
+    else if (dec) { qty = parseFloat(dec[1].replace(',', '.')); rest = dec[2]; }
+    else { const w = rest.match(/^(a|an|one|half|couple of)\s+(.*)$/); if (w) { qty = w[1] === 'half' ? 0.5 : w[1] === 'couple of' ? 2 : 1; rest = w[2]; } }
+    let unit = null, size = null;
+    const um = rest.match(/^([a-z]+)\.?\s+(.*)$/) || rest.match(/^([a-z]+)\.?$/);
+    if (um && UNIT_WORDS[um[1]]) { unit = UNIT_WORDS[um[1]]; rest = um[2] || ''; }
+    rest = rest.replace(/^of\s+/, '');
+    const sm = rest.match(/^(small|medium|large)\s+(.*)$/); if (sm) { size = sm[1]; rest = sm[2]; }
+    const state = KG.stateCooked.test(rest) && !KG.stateRaw.test(rest) ? 'cooked' : KG.stateRaw.test(rest) ? 'raw' : null;
+    const name = rest.replace(KG.filler, ' ').replace(/[^a-z0-9\- ]/g, ' ').replace(/\s+/g, ' ').trim() || rest.trim();
+    const noAmount = qty == null && /\b(to taste|as needed|for serving|optional)\b/.test(lower);
+    return { text: String(line).trim(), qty, unit, size, name, state, explicitG, noAmount, isCan: unit === 'can' };
+  },
+  /** Match an ingredient name to a food node. Returns {food, score, via}. */
+  resolveFood(name, foods) {
+    const stem = w => w.length > 3 && w.endsWith('s') && !w.endsWith('ss') ? w.slice(0, -1) : w;
+    const toks = name.split(' ').filter(Boolean).map(stem); if (!toks.length) return { food: null, score: 0 };
+    const byName = n => foods.find(f => f.name === n);
+    // ALIAS edges: try the longest phrase first
+    for (let len = toks.length; len >= 1; len--) for (let st = 0; st + len <= toks.length; st++) {
+      const phrase = toks.slice(st, st + len).join(' '), cands = [phrase, phrase + 's'];
+      for (const c of cands) if (KG.alias[c]) { const f = byName(KG.alias[c]); if (f) return { food: f, score: len === toks.length ? 1 : 0.85, via: 'alias' }; }
+    }
+    let best = null, bs = 0;
+    foods.forEach(f => {
+      const ft = f.name.toLowerCase().replace(/[^a-z0-9 ]/g, ' ').split(' ').filter(Boolean).map(stem);
+      const hit = toks.filter(t => ft.includes(t)).length; if (!hit) return;
+      const score = hit / toks.length * 0.7 + hit / ft.length * 0.3;
+      if (score > bs) { bs = score; best = f; }
+    });
+    return bs >= 0.55 ? { food: best, score: bs, via: 'name' } : { food: null, score: bs };
+  },
+  /** Ingredient quantity → grams (as listed) with a confidence and the reasoning. */
+  ingredientGrams(p, food) {
+    const why = []; let g = null, conf = 'high';
+    const dens = KG.density[food.name] || 1;
+    if (p.explicitG) { g = p.explicitG * (p.qty && p.unit === 'can' ? p.qty : 1); why.push(`Weight in brackets: ${r0(g)} g.`); return { g, conf, why }; }
+    if (p.qty == null) { return { g: null, conf: 'low', why: ['No amount given — add one (e.g. "100 g").'] }; }
+    const q = p.qty;
+    switch (p.unit) {
+      case 'g': g = q; why.push(`${q} g.`); break;
+      case 'kg': g = q * 1000; why.push(`${q} kg = ${r0(g)} g.`); break;
+      case 'oz': g = q * 28.35; why.push(`${q} oz × 28.35 = ${r0(g)} g.`); break;
+      case 'lb': g = q * 453.6; why.push(`${q} lb × 453.6 = ${r0(g)} g.`); break;
+      case 'ml': g = q * dens; why.push(`${q} ml × density ${dens} = ${r0(g)} g.`); break;
+      case 'l': g = q * 1000 * dens; why.push(`${q} L × density ${dens} = ${r0(g)} g.`); break;
+      case 'cup': if (food.cupG) { g = q * food.cupG; why.push(`1 cup of ${food.name.toLowerCase()} ≈ ${food.cupG} g.`); conf = 'medium'; } else { g = q * 240 * dens; why.push(`1 cup ≈ 240 ml × density ${dens} (guess).`); conf = 'low'; } break;
+      case 'tbsp': { const t = KG.tbsp[food.name]; g = q * (t || 12); why.push(`1 tbsp ≈ ${t || 12} g${t ? '' : ' (generic guess)'}.`); conf = t ? 'medium' : 'low'; break; }
+      case 'tsp': { const t = (KG.tbsp[food.name] || 12) / 3; g = q * t; why.push(`1 tsp ≈ ${r1(t)} g.`); conf = KG.tbsp[food.name] ? 'medium' : 'low'; break; }
+      case 'pinch': g = q * 0.4; why.push('A pinch ≈ 0.4 g.'); conf = 'low'; break;
+      case 'can': { const c = KG.can[food.name]; g = q * (c || 400); why.push(`1 can ≈ ${c || 400} g${c ? ' (drained)' : ' (generic guess)'}.`); conf = c ? 'medium' : 'low'; break; }
+      case 'scoop': g = q * (KG.piece[food.name] || 30); why.push(`1 scoop ≈ ${KG.piece[food.name] || 30} g.`); conf = 'medium'; break;
+      case 'handful': g = q * 30; why.push('A handful ≈ 30 g.'); conf = 'low'; break;
+      default: { // count of pieces (eggs, bananas, slices, cloves) or a bare number
+        const size = p.size || 'medium', per = KG.piece[food.name] && !p.size ? KG.piece[food.name] : food.portions[size];
+        if (p.unit == null && q >= 20 && !p.size) { g = q; why.push(`Bare number ${q} read as grams.`); conf = 'low'; }
+        else { g = q * per; why.push(`${q} × ${p.size ? p.size + ' ' : ''}piece ≈ ${r0(per)} g each.`); conf = KG.piece[food.name] || p.size || food.portions.medium ? 'medium' : 'low'; }
+      }
+    }
+    return { g, conf, why };
+  },
+  /** Full recipe maths. lines: [{text, foodId?, state?, gramsOverride?, fixed?}] → per-line detail, totals, per-serving. */
+  recipeCompute(lines, servings, foods, getFood) {
+    const sv = Math.max(0.25, +servings || 1), out = [], total = {}; NUTS.forEach(k => { total[k] = 0; });
+    const flags = new Set(); let worst = 'high';
+    const rank = { high: 0, medium: 1, low: 2 };
+    lines.forEach(l => {
+      if (l.fixed) {
+        NUTS.forEach(k => { total[k] += l.fixed[k] || 0; }); (l.fixed.flags || []).forEach(f => flags.add(f));
+        out.push({ text: l.text, fixed: true, n: l.fixed, conf: 'medium', why: ['Saved nutrition entered manually.'], grams: l.fixed.grams || null }); if (rank.medium > rank[worst]) worst = 'medium'; return;
+      }
+      const p = Calc.parseIngredient(l.text); if (!p) return;
+      let food = l.foodId ? getFood(l.foodId) : null, via = l.foodId ? 'chosen' : null, mconf = 'high';
+      if (!food) { const r = Calc.resolveFood(p.name, foods); food = r.food; via = r.via; mconf = r.score >= 0.99 ? 'high' : r.score >= 0.8 ? 'medium' : 'low'; }
+      if (!food) { out.push({ text: l.text, p, unresolved: true, conf: 'low', why: ['No matching food found — tap Change to pick one.'] }); worst = 'low'; return; }
+      const yld = KG.yield[food.name] || null;
+      const state = l.state || p.state || (p.isCan ? 'cooked' : yld ? 'raw' : 'asis');
+      let gr = Calc.ingredientGrams(p, food), grams = l.gramsOverride != null ? l.gramsOverride : gr.g, conf = gr.conf;
+      const why = [`Matched “${p.name}” → ${food.name} (${via === 'alias' ? 'knowledge graph alias' : via === 'chosen' ? 'your choice' : 'name similarity'}).`].concat(gr.why);
+      if (l.gramsOverride != null) { why.push(`Amount overridden to ${r0(grams)} g.`); conf = 'high'; }
+      if (grams == null) { out.push({ text: l.text, p, food, noAmount: true, conf: 'low', why }); worst = 'low'; return; }
+      let eff = grams;
+      if (yld && state === 'raw') { eff = grams * yld; why.push(`Raw/dry weight → cooked: ${r0(grams)} g × ${yld} = ${r0(eff)} g ${food.name.toLowerCase()} (the database lists it cooked).`); }
+      else if (yld) why.push(`Treated as already cooked, so no yield conversion.`);
+      if (mconf === 'low' && rank[conf] < 2) conf = 'medium'; if (rank[mconf] > rank[conf]) conf = mconf;
+      const n = Calc.scaleFood(food, eff); NUTS.forEach(k => { total[k] += n[k]; }); food.flags.forEach(f => flags.add(f));
+      if (rank[conf] > rank[worst]) worst = conf;
+      out.push({ text: l.text, p, food, via, conf, grams, eff, state, yield: yld, n, why });
+    });
+    const per = {}; NUTS.forEach(k => { per[k] = total[k] / sv; });
+    const unresolved = out.filter(o => o.unresolved || o.noAmount).length;
+    return { lines: out, total, per, servings: sv, flags: [...flags], conf: worst, unresolved,
+      why: [`Total of all ingredients: <code>${r0(total.kcal)} kcal</code>.`, `Per serving = total ÷ ${sv} servings = <code>${r0(per.kcal)} kcal</code> (P ${r0(per.protein)} g · C ${r0(per.carbs)} g · F ${r0(per.fat)} g).`,
+        unresolved ? `${unresolved} ingredient${unresolved > 1 ? 's' : ''} could not be counted yet.` : 'All ingredients were matched.', `Confidence ${worst === 'high' ? 'high' : worst === 'medium' ? 'medium (some unit conversions are estimates)' : 'low (some amounts or matches are guesses)'}.`] };
+  },
+  /** Dish template lookup by free text. */
+  findDishes(q) {
+    const t = q.toLowerCase().trim(); if (t.length < 3) return [];
+    return KG.dishes.filter(d => d.name.toLowerCase().includes(t) || d.aka.some(a => t.includes(a) || a.includes(t)));
+  }
+});
+
 /* ------------------------------ Units ------------------------------ */
 const U = {
   w: () => Store.get().settings.units.weight, h: () => Store.get().settings.units.height, v: () => Store.get().settings.units.volume,
@@ -1214,7 +1416,7 @@ function viewFood() {
   MEALS.forEach(m => {
     const list = ent.filter(e => e.meal === m); if (!list.length) return;
     const mt = Calc.dayTotals(list);
-    h += `<div class="row sp" style="margin-top:14px"><h3 style="margin:0">${cap(m)} <span class="muted small">· ${fmtRange(mt.kcal)} kcal</span></h3><button class="link" data-act="saveMeal" data-meal="${m}">Save meal</button></div>
+    h += `<div class="row sp" style="margin-top:14px"><h3 style="margin:0">${cap(m)} <span class="muted small">· ${fmtRange(mt.kcal)} kcal</span></h3><button class="link" data-act="saveMeal" data-meal="${m}">Save as recipe</button></div>
       ${list.map(e => `<div class="item" data-del="entry:${e.id}"><div class="in" data-act="editEntry" data-id="${e.id}"><span style="min-width:0"><b>${esc(e.name)}</b><br><span class="small muted">${esc(e.qtyLabel || '')} · ${e.accuracy === 'exact' ? 'exact' : e.accuracy === 'good' ? 'good guess' : 'rough'}</span></span><span style="text-align:right;white-space:nowrap"><b>${r0(e.kcal)}</b> <span class="small muted">kcal</span><br><span class="small muted">P ${r0(e.protein)} · C ${r0(e.carbs)} · F ${r0(e.fat)}</span></span></div></div>`).join('')}`;
   });
   if (ent.length) h += `<p class="tiny muted">Tap to edit · swipe left to delete</p>`;
@@ -1275,11 +1477,11 @@ function foodSearchSheet(preDate) {
   S.addDate = date; S.addTab = S.addTab || 'all';
   openSheet('Add food', `
     <input id="fq" type="search" placeholder="Search foods… (e.g. chicken, banana)" autocomplete="off" value="${esc(S.foodQuery)}" style="margin-bottom:8px">
-    <div class="seg" id="addTabs" style="margin:8px 0">${[['all', 'All'], ['recent', 'Recent'], ['fav', '⭐'], ['meals', 'Meals']].map(([k, l]) => `<button data-v="${k}" class="${S.addTab === k ? 'on' : ''}">${l}</button>`).join('')}</div>
+    <div class="seg" id="addTabs" style="margin:8px 0">${[['all', 'All'], ['recent', 'Recent'], ['fav', '⭐'], ['recipes', 'Recipes']].map(([k, l]) => `<button data-v="${k}" class="${S.addTab === k ? 'on' : ''}">${l}</button>`).join('')}</div>
     <div id="fres"></div>
     <div class="grid2" style="margin-top:12px"><button data-act="customFood">＋ Custom food</button><button data-act="manualEntry">Quick entry (numbers)</button></div>`, sh => {
     const draw = () => { $('#fres').innerHTML = foodResults(); };
-    $('#fq').addEventListener('input', e => { S.foodQuery = e.target.value; draw(); });
+    $('#fq').addEventListener('input', e => { S.foodQuery = e.target.value; if (S.foodQuery.trim() && S.addTab !== 'all') { S.addTab = 'all'; sh.querySelectorAll('#addTabs button').forEach(x => x.classList.toggle('on', x.dataset.v === 'all')); } draw(); });
     $('#addTabs').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; S.addTab = b.dataset.v; sh.querySelectorAll('#addTabs button').forEach(x => x.classList.toggle('on', x === b)); draw(); });
     draw();
   });
@@ -1287,17 +1489,20 @@ function foodSearchSheet(preDate) {
 function foodResults() {
   const q = S.foodQuery.trim().toLowerCase(), s = settings();
   const row = f => { const n = Calc.scaleFood(f, f.portions.medium); return `<div class="item"><div class="in" data-act="pickFood" data-id="${esc(f.id)}"><span style="min-width:0"><b>${esc(f.name)}</b><br><span class="small muted">${r0(n.kcal)} kcal · P ${r0(n.protein)} · C ${r0(n.carbs)} · F ${r0(n.fat)} · medium ${f.portions.medium} g</span></span><button data-act="favFood" data-id="${esc(f.id)}" aria-label="Favorite" style="background:none;border:0">${s.favFoods.includes(f.id) ? '⭐' : '☆'}</button></div></div>`; };
-  if (S.addTab === 'meals') {
-    const m = Store.list('savedMeals');
-    return m.length ? m.map(x => `<div class="item" data-del="meal:${x.id}"><div class="in" data-act="logMeal" data-id="${x.id}"><span><b>${esc(x.name)}</b><br><span class="small muted">${x.items.length} items · ${r0(x.items.reduce((a, i) => a + i.kcal, 0))} kcal</span></span><span class="small muted">tap to add</span></div></div>`).join('') + '<p class="tiny muted">Swipe left to delete a saved meal.</p>'
-      : `<div class="empty small">No saved meals yet. In the Food screen, tap “Save meal” on a meal to reuse it later.</div>`;
-  }
+  if (S.addTab === 'recipes') return recipesTabHtml();
   let list = allFoods();
   if (S.addTab === 'fav') list = s.favFoods.map(foodById).filter(Boolean);
   if (S.addTab === 'recent') { const seen = new Set(), out = []; Store.list('entries').slice().sort((a, b) => a.createdAt < b.createdAt ? 1 : -1).forEach(e => { const f = e.foodId && foodById(e.foodId); if (f && !seen.has(f.id) && out.length < 12) { seen.add(f.id); out.push(f); } }); list = out; }
   if (q) { const toks = q.split(/\s+/); list = list.filter(f => toks.every(t => f.name.toLowerCase().includes(t))); list.sort((a, b) => (a.name.toLowerCase().startsWith(q) ? 0 : 1) - (b.name.toLowerCase().startsWith(q) ? 0 : 1)); }
+  let pre = '';
+  if (S.addTab === 'all' && q.length >= 2) {
+    const toks2 = q.split(/\s+/);
+    pre += Store.list('recipes').filter(r => toks2.every(t => r.name.toLowerCase().includes(t))).map(r => { const c = Calc.recipeCompute(r.lines, r.servings, allFoods(), foodById); return `<div class="item"><div class="in" data-act="logRecipe" data-id="${r.id}"><span style="min-width:0"><b>📖 ${esc(r.name)}</b><br><span class="small muted">recipe · ${r.servings} servings · ${r0(c.per.kcal)} kcal per serving</span></span></div></div>`; }).join('');
+    pre += Calc.findDishes(q).slice(0, 2).map(d => `<div class="item"><div class="in" data-act="rdDish" data-i="${KG.dishes.indexOf(d)}"><span style="min-width:0"><b>🧩 ${esc(d.name)}</b><br><span class="small muted">Build from a typical recipe · per-serving nutrition worked out for you</span></span><span class="muted">›</span></div></div>`).join('');
+  }
+  if (!list.length && pre) return pre;
   if (!list.length) return `<div class="empty small">${q ? `No match for “${esc(q)}”.` : S.addTab === 'fav' ? 'No favorites yet — tap ☆ on any food.' : 'Nothing here yet.'}<br><button style="margin-top:10px" data-act="customFood">＋ Create “${esc(S.foodQuery.trim() || 'custom food')}”</button></div>`;
-  return list.slice(0, 40).map(row).join('');
+  return pre + list.slice(0, 40).map(row).join('');
 }
 
 function portionSheet(food, existing) {
@@ -1390,6 +1595,123 @@ function addEntriesFromMeal(items, date, meal) {
   const recs = items.map(i => stamp(Object.assign({}, i, { id: undefined, date, meal: meal || i.meal })));
   recs.forEach(r => { r.id = uid(); r.createdAt = nowISO(); r.updatedAt = nowISO(); Store.put('entries', r); });
   return recs;
+}
+
+/* ------------------------------ Recipes (ingredients → per-serving nutrition) ------------------------------ */
+const CONF_LABEL = { high: 'precise', medium: 'estimated', low: 'rough guess' };
+function rdLines() {
+  const nf = S.rd.fixedLines.length;
+  const fixed = S.rd.fixedLines.map(l => ({ text: l.text, fixed: l.fixed }));
+  const txt = S.rd.text.split(/\n/).map(x => x.trim()).filter(Boolean).map(t => { const ov = S.rd.ov[Calc.normName(t)] || {}; return { text: t, foodId: ov.foodId || null, state: ov.state || null, gramsOverride: ov.gramsOverride != null ? ov.gramsOverride : null }; });
+  return { lines: fixed.concat(txt), nf };
+}
+function rdSync() {
+  if (!S.rd) return;
+  const g = id => $('#' + id);
+  if (g('rdName')) S.rd.name = g('rdName').value;
+  if (g('rdText')) S.rd.text = g('rdText').value;
+  if (g('rdServ')) { const v = num('rdServ'); if (v != null && v > 0) S.rd.servings = v; }
+  if (g('rdCooked')) { const v = num('rdCooked'); S.rd.cookedG = v != null && v > 0 ? v : null; }
+}
+function rdCompute() { const { lines } = rdLines(); return Calc.recipeCompute(lines, S.rd.servings, allFoods(), foodById); }
+function recipeOutHtml() {
+  const { lines, nf } = rdLines();
+  if (!lines.length) return `<div class="empty small" style="padding:14px">Add ingredients above — one per line. I'll match each to a food, convert units and raw→cooked weights, and work out nutrition per serving.</div>`;
+  const c = rdCompute(), per = c.per;
+  let h = `<div class="hero" style="padding:14px;margin:10px 0"><div class="row sp"><span class="tiny muted">PER SERVING · ${c.servings} serving${c.servings === 1 ? '' : 's'} total</span><span class="pill ${c.conf === 'high' ? 'good' : c.conf === 'medium' ? 'warn' : 'bad'}">${CONF_LABEL[c.conf]}</span></div>
+    <div style="font-size:28px;font-weight:800;margin:2px 0">${r0(per.kcal)} kcal</div>
+    <div class="small muted">P ${r0(per.protein)} g · C ${r0(per.carbs)} g · F ${r0(per.fat)} g · fiber ${r0(per.fiber)} g · sodium ${r0(per.sodium)} mg · added sugar ${r1(per.addedSugar)} g</div>
+    ${c.flags.length ? `<div style="margin-top:6px">${c.flags.map(f => `<span class="pill good">${FLAG_NAMES[f]}</span>`).join(' ')}</div>` : ''}${why(c.why)}</div>`;
+  h += `<h3 style="margin:12px 0 4px">Ingredients <span class="muted small">· ${r0(c.total.kcal)} kcal total</span></h3>`;
+  h += c.lines.map((l, i) => {
+    if (l.fixed) return `<div class="rline"><div class="tx"><b>${esc(l.text)}</b><br><span class="small muted">saved nutrition</span></div><b>${r0(l.n.kcal)}</b><button class="link" data-act="rdDropFixed" data-i="${i}" style="color:var(--danger)">Remove</button></div>`;
+    if (l.unresolved) return `<div class="rline bad"><div class="tx"><b>${esc(l.text)}</b><br><span class="small" style="color:var(--danger)">No matching food</span></div><button class="link" data-act="rdPick" data-i="${i - nf}">Pick food</button></div>`;
+    if (l.noAmount) return `<div class="rline bad"><div class="tx"><b>${esc(l.text)}</b><br><span class="small" style="color:var(--danger)">No amount — add one, e.g. “100 g”</span></div><button class="link" data-act="rdPick" data-i="${i - nf}">Food</button></div>`;
+    return `<div class="rline"><div class="tx"><b>${r0(l.grams)} g</b> ${esc(l.food.name)}<br><span class="small muted">“${esc(l.text)}” · <span class="pill ${l.conf === 'high' ? 'good' : l.conf === 'medium' ? 'warn' : 'bad'}">${CONF_LABEL[l.conf]}</span></span></div><b>${r0(l.n.kcal)}</b>
+      <div class="rbtns">${l.yield ? `<button class="link" data-act="rdState" data-i="${i - nf}">${l.state === 'raw' ? 'Raw → cooked' : 'Cooked'}</button>` : ''}<button class="link" data-act="rdPick" data-i="${i - nf}">Change</button></div></div>${why(l.why)}`;
+  }).join('');
+  return h;
+}
+function recipeSheet(keep) {
+  if (!keep || !S.rd) return;
+  const R = S.rd;
+  openSheet(R.id ? 'Edit recipe' : 'New recipe', `
+    <label class="f" style="margin-top:4px"><span>Recipe name</span><input id="rdName" value="${esc(R.name)}" placeholder="e.g. Chicken stir-fry" autocomplete="off"></label>
+    <div class="fld"><span>Servings<br><span class="tiny muted">how many portions it makes</span></span><div class="stp"><button type="button" data-step="rdServ" data-d="-1">−</button><input id="rdServ" inputmode="decimal" value="${R.servings}"><button type="button" data-step="rdServ" data-d="1">+</button></div></div>
+    <label class="f"><span>Ingredients — one per line</span><textarea id="rdText" rows="6" placeholder="200 g raw chicken breast&#10;1 cup cooked rice&#10;2 tbsp olive oil&#10;3 eggs">${esc(R.text)}</textarea></label>
+    <p class="tiny muted" style="margin:-6px 0 8px">Tip: say “raw” or “dry” for uncooked weights — I convert to cooked automatically.</p>
+    <div id="rdOut">${recipeOutHtml()}</div>
+    <details><summary style="min-height:44px;display:flex;align-items:center">Optional: total cooked weight of the whole batch</summary><label class="f" style="margin-top:0"><span>Grams (lets you log “I ate 350 g of it”)</span><input id="rdCooked" inputmode="decimal" value="${R.cookedG || ''}"></label></details>
+    <p class="err" id="rdErr"></p>
+    <button class="primary block" id="rdSave">Save recipe</button><button class="block" id="rdSaveLog" style="margin-top:8px">Save & log servings</button>`, sh => {
+    const refresh = () => { rdSync(); $('#rdOut').innerHTML = recipeOutHtml(); };
+    let t = null; $('#rdText').addEventListener('input', () => { clearTimeout(t); t = setTimeout(refresh, 350); });
+    $('#rdServ').addEventListener('change', refresh); $('#rdServ').addEventListener('input', () => { const v = num('rdServ'); if (v > 0) refresh(); });
+    const save = andLog => {
+      rdSync(); const { lines } = rdLines();
+      if (!R.name.trim()) { $('#rdErr').textContent = 'Give the recipe a name.'; return; }
+      if (!lines.length) { $('#rdErr').textContent = 'Add at least one ingredient.'; return; }
+      if (!(R.servings >= 0.25 && R.servings <= 100)) { $('#rdErr').textContent = 'Servings should be between 0.25 and 100.'; return; }
+      const rec = Object.assign(R.id ? Object.assign({}, Store.byId('recipes', R.id)) : stamp({}), { name: R.name.trim(), servings: R.servings, cookedG: R.cookedG, lines, updatedAt: nowISO() });
+      persistWarn(Store.put('recipes', rec)); S.rd = null; closeSheet(); rerender();
+      if (andLog) logRecipeSheet(rec); else toast('Recipe saved');
+    };
+    $('#rdSave').addEventListener('click', () => save(false)); $('#rdSaveLog').addEventListener('click', () => save(true));
+  });
+}
+function startRecipe(rec, template) {
+  S.rd = { id: rec ? rec.id : null, name: rec ? rec.name : template ? template.name : '', servings: rec ? rec.servings : template ? template.servings : 2, cookedG: rec ? rec.cookedG : null, ov: {}, fixedLines: [], text: '' };
+  if (rec) {
+    S.rd.fixedLines = rec.lines.filter(l => l.fixed).map(l => ({ text: l.text, fixed: l.fixed }));
+    rec.lines.filter(l => !l.fixed).forEach(l => { S.rd.text += (S.rd.text ? '\n' : '') + l.text; S.rd.ov[Calc.normName(l.text)] = { foodId: l.foodId || undefined, state: l.state || undefined, gramsOverride: l.gramsOverride != null ? l.gramsOverride : undefined }; });
+  } else if (template) S.rd.text = template.lines.join('\n');
+  recipeSheet(true);
+}
+function foodPickerSheet(onPick, title) {
+  openSheet(title || 'Choose food', `<input id="fpq" type="search" placeholder="Search foods…" autocomplete="off"><div id="fpres" style="margin-top:8px"></div>`, () => {
+    const draw = () => { const q = $('#fpq').value.trim().toLowerCase(), toks = q.split(/\s+/).filter(Boolean); const list = allFoods().filter(f => toks.every(t => f.name.toLowerCase().includes(t))).slice(0, 40);
+      $('#fpres').innerHTML = list.map(f => `<div class="item"><div class="in" data-act="fpPick" data-id="${esc(f.id)}"><span style="min-width:0"><b>${esc(f.name)}</b><br><span class="small muted">${r0(f.per100.kcal)} kcal / 100 g</span></span></div></div>`).join('') || `<div class="empty small">No match.</div>`; };
+    $('#fpq').addEventListener('input', draw); draw(); S.fpCb = onPick;
+  });
+}
+function logRecipeSheet(rec, date) {
+  const c = Calc.recipeCompute(rec.lines, rec.servings, allFoods(), foodById);
+  let sv = 1, mode = 'serv', grams = rec.cookedG ? Math.round(rec.cookedG / rec.servings) : 0, acc = c.conf === 'low' ? 'rough' : 'good', meal = mealNow();
+  const dt = date || S.foodDate || todayStr();
+  const factor = () => mode === 'serv' ? sv / rec.servings : grams / rec.cookedG;
+  const scaled = () => { const f = factor(), n = {}; NUTS.forEach(k => { n[k] = Math.round(c.total[k] * f * 10) / 10; }); return n; };
+  const lab = () => mode === 'serv' ? `${sv} of ${rec.servings} servings` : `${r0(grams)} g of the batch`;
+  openSheet(rec.name, `
+    ${rec.cookedG ? `<div class="seg" id="lgMode" style="margin-bottom:10px"><button data-v="serv" class="on">By servings</button><button data-v="g">By grams</button></div>` : ''}
+    <div class="fld"><span id="lgLab">Servings eaten<br><span class="tiny muted">recipe makes ${rec.servings}</span></span><div class="stp"><button type="button" data-step="lgQty" data-d="-0.5">−</button><input id="lgQty" inputmode="decimal" value="1"><button type="button" data-step="lgQty" data-d="0.5">+</button></div></div>
+    <div class="seg" id="lgQuick" style="margin:6px 0 10px">${[0.5, 1, 1.5, 2].map(v => `<button data-v="${v}">${v}×</button>`).join('')}</div>
+    <div class="card" id="lgPrev" style="margin:8px 0"></div>
+    <label class="f"><span>How accurate is this estimate?</span></label><div class="seg" id="aSeg">${[['exact', 'Exact'], ['good', 'Good guess'], ['rough', 'Rough']].map(([k, l]) => `<button data-v="${k}" class="${k === acc ? 'on' : ''}">${l}</button>`).join('')}</div>
+    <label class="f"><span>Meal</span></label><div class="seg c2" id="mSeg">${MEALS.map(m => `<button data-v="${m}" class="${m === meal ? 'on' : ''}">${cap(m)}</button>`).join('')}</div>
+    <button class="primary block" id="lgAdd" style="margin-top:14px">Add to ${dt === todayStr() ? 'today' : fmtDate(dt)}</button>
+    <button class="link block" data-act="editRecipe" data-id="${rec.id}">Edit recipe</button>`, sh => {
+    const draw = () => { const n = scaled(); $('#lgPrev').innerHTML = `<b>${r0(n.kcal)} kcal</b> <span class="muted small">· ${lab()}</span><div class="small muted" style="margin-top:4px">P ${r0(n.protein)} g · C ${r0(n.carbs)} g · F ${r0(n.fat)} g · fiber ${r0(n.fiber)} g · sodium ${r0(n.sodium)} mg · added sugar ${r1(n.addedSugar)} g</div>${why([`Whole recipe: ${r0(c.total.kcal)} kcal ÷ ${rec.servings} servings = ${r0(c.per.kcal)} kcal per serving.`, mode === 'serv' ? `You ate ${sv} serving${sv === 1 ? '' : 's'}: ${r0(c.per.kcal)} × ${sv} = <code>${r0(n.kcal)} kcal</code>.` : `You ate ${r0(grams)} g of ${r0(rec.cookedG)} g cooked batch weight (${r1(grams / rec.cookedG * 100)}%): <code>${r0(n.kcal)} kcal</code>.`, `Recipe confidence: ${CONF_LABEL[c.conf]}.`])}`; };
+    const upd = () => { const v = num('lgQty'); if (v != null && v > 0) { if (mode === 'serv') sv = v; else grams = v; draw(); } };
+    $('#lgQty').addEventListener('input', upd); sh.addEventListener('click', e => { if (e.target.closest('[data-step=lgQty]')) setTimeout(upd, 0); });
+    $('#lgQuick').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; mode = 'serv'; sv = +b.dataset.v; $('#lgQty').value = sv; draw(); });
+    if (rec.cookedG) $('#lgMode').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; mode = b.dataset.v; sh.querySelectorAll('#lgMode button').forEach(x => x.classList.toggle('on', x === b)); $('#lgQty').value = mode === 'serv' ? sv : grams; $('#lgQuick').style.display = mode === 'serv' ? '' : 'none'; sh.querySelectorAll('[data-step=lgQty]').forEach((x, i) => x.dataset.d = (i ? 1 : -1) * (mode === 'serv' ? 0.5 : 25)); draw(); });
+    const seg = (id, fn) => $(id).addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; $(id).querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b)); fn(b.dataset.v); });
+    seg('#aSeg', v => { acc = v; }); seg('#mSeg', v => { meal = v; });
+    $('#lgAdd').addEventListener('click', () => {
+      const f = factor(); if (!(f > 0) || f > 100) { toast('Enter an amount greater than 0.'); return; }
+      const rcp = stamp(Object.assign({ date: dt, meal, name: rec.name, foodId: null, recipeId: rec.id, qtyLabel: lab(), accuracy: acc, flags: c.flags }, scaled()));
+      persistWarn(Store.put('entries', rcp)); S.foodDate = dt; closeSheet(); rerender(); toast(`Added ${rec.name} · ${r0(rcp.kcal)} kcal`, () => { Store.del('entries', rcp.id); rerender(); }); buzz(15);
+    });
+    draw();
+  });
+}
+function recipesTabHtml() {
+  const list = Store.list('recipes');
+  let h = `<button class="primary block" data-act="newRecipe" style="margin-bottom:8px">＋ New recipe</button>`;
+  if (list.length) h += list.map(r => { const c = Calc.recipeCompute(r.lines, r.servings, allFoods(), foodById); return `<div class="item" data-del="recipe:${r.id}"><div class="in" data-act="logRecipe" data-id="${r.id}"><span style="min-width:0"><b>${esc(r.name)}</b><br><span class="small muted">${r.servings} serving${r.servings === 1 ? '' : 's'} · P ${r0(c.per.protein)} · C ${r0(c.per.carbs)} · F ${r0(c.per.fat)} per serving</span></span><span style="text-align:right;white-space:nowrap"><b>${r0(c.per.kcal)}</b><span class="small muted"> kcal</span><br><span class="tiny muted">per serving</span></span></div></div>`; }).join('') + '<p class="tiny muted">Tap to log servings · swipe left to delete</p>';
+  else h += `<div class="empty small">No recipes yet. Add the ingredients once, set how many servings it makes, and logging a serving takes two taps.</div>`;
+  h += `<h3 style="margin:14px 0 4px">Start from a typical recipe</h3>` + KG.dishes.map((d, i) => `<div class="item"><div class="in" data-act="rdDish" data-i="${i}"><span style="min-width:0"><b>${esc(d.name)}</b><br><span class="small muted">${d.lines.length} ingredients · makes ${d.servings}</span></span><span class="muted">›</span></div></div>`).join('');
+  return h;
 }
 
 /* ------------------------------ Exercise info & picker ------------------------------ */
@@ -1989,8 +2311,8 @@ function removeDay(d) { Store.list('metrics').filter(m => m.date === d && (m.typ
 function deleteItem(kind, id) {
   let removed = [], coll;
   if (kind === 'day') { coll = 'metrics'; removed = Store.list('metrics').filter(m => m.date === id && (m.type === 'weight' || m.type === 'bodyfat')); removeDay(id); }
-  else { coll = { entry: 'entries', meal: 'savedMeals', session: 'sessions' }[kind]; const r = Store.byId(coll, id); if (r) removed = [r]; Store.del(coll, id); }
-  rerender(); if (kind === 'meal' && $('#sheet').classList.contains('on')) { $('#fres').innerHTML = foodResults(); }
+  else { coll = { entry: 'entries', recipe: 'recipes', session: 'sessions' }[kind]; const r = Store.byId(coll, id); if (r) removed = [r]; Store.del(coll, id); }
+  rerender(); if (kind === 'recipe' && $('#sheet').classList.contains('on')) { $('#fres').innerHTML = foodResults(); }
   toast('Deleted', () => { removed.forEach(r => Store.put(coll, r)); rerender(); if ($('#fres')) $('#fres').innerHTML = foodResults(); });
 }
 
@@ -2091,11 +2413,18 @@ const A = {
   editEntry(el) { const e = Store.byId('entries', el.dataset.id); if (e) manualSheet(e); },
   saveMeal(el) {
     const list = D.entries(S.foodDate).filter(e => e.meal === el.dataset.meal);
-    openSheet('Save meal', `<label class="f"><span>Name</span><input id="smName" value="${cap(el.dataset.meal)} ${new Date().toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}" autocomplete="off"></label><p class="small muted">${list.length} items · ${r0(list.reduce((a, e) => a + e.kcal, 0))} kcal</p><button class="primary block" id="smOk">Save</button>`, () => {
-      $('#smOk').addEventListener('click', () => { const name = $('#smName').value.trim(); if (!name) return; Store.put('savedMeals', stamp({ name, items: list.map(e => { const c = Object.assign({}, e); ['id', 'createdAt', 'updatedAt', 'date', 'source'].forEach(k => delete c[k]); return c; }) })); closeSheet(); toast('Meal saved — find it under Add food → Meals'); });
+    openSheet('Save as recipe', `<label class="f"><span>Name</span><input id="smName" value="${cap(el.dataset.meal)} ${new Date().toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}" autocomplete="off"></label><p class="small muted">${list.length} items · ${r0(list.reduce((a, e) => a + e.kcal, 0))} kcal as 1 serving. You can change the servings later.</p><button class="primary block" id="smOk">Save</button>`, () => {
+      $('#smOk').addEventListener('click', () => { const name = $('#smName').value.trim(); if (!name) return; Store.put('recipes', stamp({ name, servings: 1, cookedG: null, lines: list.map(e => ({ text: e.name, fixed: Object.assign(NUTS.reduce((o, k) => { o[k] = e[k] || 0; return o; }, {}), { flags: e.flags || [], grams: e.grams || null }) })) })); closeSheet(); toast('Recipe saved — find it under Add food → Recipes'); });
     });
   },
-  logMeal(el) { const m = Store.byId('savedMeals', el.dataset.id); if (!m) return; const recs = addEntriesFromMeal(m.items, S.addDate || S.foodDate, mealNow()); closeSheet(); rerender(); toast(`Added ${m.name}`, () => { recs.forEach(r => Store.del('entries', r.id)); rerender(); }); },
+  newRecipe() { startRecipe(null, null); },
+  editRecipe(el) { const r = Store.byId('recipes', el.dataset.id); if (r) { closeSheet(); startRecipe(r, null); } },
+  logRecipe(el) { const r = Store.byId('recipes', el.dataset.id); if (r) { closeSheet(); logRecipeSheet(r, S.addDate || S.foodDate); } },
+  rdDish(el) { closeSheet(); startRecipe(null, KG.dishes[+el.dataset.i]); },
+  rdState(el) { rdSync(); const { lines, nf } = rdLines(), i = +el.dataset.i, c = rdCompute(), cur = c.lines[nf + i].state; const key = Calc.normName(lines[nf + i].text); S.rd.ov[key] = Object.assign(S.rd.ov[key] || {}, { state: cur === 'raw' ? 'cooked' : 'raw' }); $('#rdOut').innerHTML = recipeOutHtml(); },
+  rdPick(el) { rdSync(); const { lines, nf } = rdLines(), i = +el.dataset.i, key = Calc.normName(lines[nf + i].text); foodPickerSheet(id => { S.rd.ov[key] = Object.assign(S.rd.ov[key] || {}, { foodId: id }); recipeSheet(true); }, 'Pick the matching food'); },
+  rdDropFixed(el) { rdSync(); S.rd.fixedLines.splice(+el.dataset.i, 1); recipeSheet(true); },
+  fpPick(el) { const id = el.dataset.id, cb = S.fpCb; closeSheet(); if (cb) cb(id); },
   copyYesterday() {
     const y = shiftDate(S.foodDate, -1), src = D.entries(y);
     if (!src.length) return toast('Nothing logged on the previous day.');
